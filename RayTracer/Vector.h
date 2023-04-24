@@ -19,7 +19,7 @@ class Vector {
 		}
 
 
-		inline 	void normalizeVector() {
+		inline void normalizeVector() {
 
 			double mag = magnitude();
 
