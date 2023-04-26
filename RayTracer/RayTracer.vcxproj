@@ -130,6 +130,7 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="pixel.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="ray.h" />

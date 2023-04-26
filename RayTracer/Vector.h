@@ -1,5 +1,6 @@
 #pragma once
 #include<cmath>
+#include"point.h"
 
 class Vector {
 	public:
@@ -23,9 +24,9 @@ class Vector {
 
 			double mag = magnitude();
 
-			x /= mag;
-			y /= mag;
-			z /= mag;
+			x = x/ mag;
+			y = y/ mag;
+			z = z/mag;
 
 		}
 
@@ -50,7 +51,10 @@ class Vector {
 
 };
 
+ void printVector(Vector v) {
+			std::cout << "(" << v.x << " , " << v.y << " , " << v.z << ")" << std::endl;
 
+		}
 Vector addVectors(Vector a, Vector b) {
 
 	return Vector((a.x+b.x),(a.y+b.y),(a.z+b.z));
@@ -64,6 +68,12 @@ Vector addVectors(Vector a, double b) {
 
 }
 
+Vector addVectors(Vector a, Point b) {
+	
+
+	return Vector((a.x+b.x),(a.y+b.y),(a.z+b.z));
+
+}
 Vector subVectors(Vector a, Vector b) {
 
 	return Vector((a.x-b.x),(a.y-b.y),(a.z-b.z));
@@ -77,6 +87,12 @@ Vector subVectors(Vector a, double b) {
 
 }
 
+Vector subVectors(Vector a, Point b) {
+	
+
+	return Vector((b.x-a.x),(b.y-a.y),(b.z-a.z));
+
+}
 
 Vector multVectors(Vector a, Vector b) {
 

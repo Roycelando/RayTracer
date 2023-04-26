@@ -17,4 +17,24 @@ class Point {
 		}
 
 
+
 };
+
+	Point addPoints(Point a, Point b) {
+		 return Point(a.x+b.x, a.y+b.y, a.z+b.z);
+
+	}
+
+	Point subPoints(Point a, Point b) {
+		 return Point(a.x-b.x, a.y-b.y, a.z-b.z);
+
+	}
+
+	/*
+	Vector subPointsAndGetVector(Point a, Point b) {
+
+		 return Vector(a.x-b.x, a.y-b.y, a.z-b.z);
+
+	}
+	
+	*/
