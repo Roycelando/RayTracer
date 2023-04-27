@@ -3,19 +3,28 @@
 #include"ray.h"
 #include"Vector.h"
 #include<cmath>
+#include"material.h"
 
 class Shape {
 	public:
 		Point origin;
 		Vector normal;
+		Material* mat;
 		
 		Shape() {
 			origin = Point();
 			normal = Vector();
+			mat = new Rubber();
 		}
 
 		Shape(Point origin) {
 			this->origin = origin;
+			mat = new Rubber();
+		}
+
+		Shape(Point origin, Material mat) {
+			this->origin = origin;
+			this->mat = &mat;
 		}
 
 		Shape(double x, double y, double z): origin(x,y,z) {
@@ -23,7 +32,8 @@ class Shape {
 		}
 
 
-		virtual bool intersect(Ray& ray , Point& ri, Vector& normal) {
+		virtual bool intersect(Ray& ray , Point& ri, Vector& normal, double& tclose, double& tfar, Shape* & hit, Shape* & curObj) {
+			//std::cout << "is my hunc corrcect?" << std::endl;
 			return false;
 		}
 
@@ -39,15 +49,24 @@ class Sphere: public Shape {
 			Sphere() {
 				radius = 1.0;
 				origin = Point(0,0,-2);
-				
-			}
+				mat = new Rubber();
 
-			Sphere (double radius, Point origin){
+			}
+			
+		Sphere (double radius, Point origin){
 				this->radius = radius;
 				this->origin = origin;
+				mat = new Rubber();
+
+		}
+
+			Sphere (double radius, Point origin, Material m){
+				this->radius = radius;
+				this->origin = origin;
+				mat = &m;
 			}
 
-		bool intersect(Ray& ray, Point& ri, Vector& normal) override{
+		inline bool intersect(Ray& ray, Point& ri, Vector& normal,double& tclose, double& tfar,Shape* & hit, Shape* & curObj) override {
 			// A^2t + Bt +C = 0 
 			Vector rayDir = ray.getDirection();
 			Point rayOrigin = ray.getOrigin();
@@ -73,15 +92,21 @@ class Sphere: public Shape {
 
 			//std::cout << "t0: " << t0 << " t1: " << t1 << std::endl;
 
-			if ((t0 < 0) && (t1 < 0))
+			if ((t0 < 0.1) && (t1 < 0.1))
 				return false;
 
 			double t =-1;
 
-			if (t0 > 0)
+			if (t0 >=0.1)
 				t = t0;
 			else
 				t = t1;
+
+			 if(t> tfar || t > tclose) 
+				 return false;
+
+			 tclose = t;
+			 hit = curObj;
 
 				double xi = rayOrigin.x + (rayDir.x * t);
 				double yi = rayOrigin.y + (rayDir.y * t);

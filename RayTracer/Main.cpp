@@ -6,24 +6,32 @@
 #include"vector.h"
 #include"shape.h"
 #include"camera.h"
+#include "scene.h"
+#include"lights.h"
+#include<limits>
 
 
 // function defitiion
 void saveImage();
-void createBackground(pixel* frameBuffer);
+void raytrace(pixel* frameBuffer);
 void printPixels(pixel* frameBuffer);
 
 //global variables
 const int width = 1024;
 const int height = 768;
 const double aspectRatio = width / (double)height;
+Scene scene =  Scene();
 
 
 Camera cam = Camera(0,0,1);
 
 pixel frameBuffer[(width*height)];
+pixel p = pixel(0, 0, 1);
 
-Sphere sphere = Sphere(3, Point(0,0,-10));
+Material m = Rubber(p);
+
+Sphere* sphere = new Sphere(3, Point(0,0,-5),m);
+Sphere* sphere2 = new Sphere(3, Point(0,0,-5));
 
 
 // viewport
@@ -32,9 +40,13 @@ double H = cam.origin.z * tan(cam.fov / 2.0);
 double W = H * aspectRatio;
 
 int main() {
+	scene.addObjects(sphere2);
+	scene.addObjects(sphere);
+	
+
 
 	
-	createBackground(frameBuffer);
+	raytrace(frameBuffer);
 	saveImage();
 
 		return 0;
@@ -45,7 +57,11 @@ int main() {
 /*
 * This method fills the frame buffer with the colour of our background
 */
-void createBackground(pixel* frameBuffer) {
+void raytrace(pixel* frameBuffer) {
+	double tfar = std::numeric_limits<double>::max();
+	double tclose = std::numeric_limits<double>::max();
+	Shape* hit;
+
 	for (int i = 0; i < height; i++ ) {
 		for (int j = 0; j < width; j++) {
 
@@ -54,19 +70,26 @@ void createBackground(pixel* frameBuffer) {
 
 			Ray ray = cam.castRay(W,H,valc,valr);
 
-			//printVector(ray.getDirection());
+		//	printVector(ray.getDirection());
 
 			Point ri;
 			Vector normal;
 			pixel p;
 
 
-			if (sphere.intersect(ray,ri,normal)) {
-
-				float r = 1;
-				float g = 0;
-				float b = 0;
+			if (scene.intersect(ray,ri,normal,tclose,tfar,hit)) {
+				
+				float r = hit->mat->colour.r;
+				float g = hit->mat->colour.g;
+				float b = hit->mat->colour.b;
+				
+				
+;			
 				p = { r,g,b};
+
+		//		std::cout << hit.mat.name << std::endl;
+
+			//	std::cout << "tclose: " << tclose << std::endl;
 
 			}
 
@@ -82,7 +105,7 @@ void createBackground(pixel* frameBuffer) {
 			
 		}
 
-		std::cout<<std::endl<<std::endl;
+	//	std::cout<<std::endl<<std::endl;
 	}
 
 }

@@ -131,9 +131,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="lights.h" />
+    <ClInclude Include="material.h" />
     <ClInclude Include="pixel.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="ray.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="shape.h" />
     <ClInclude Include="vector.h" />
   </ItemGroup>
