@@ -87,13 +87,6 @@ Vector subVectors(Vector a, double b) {
 
 }
 
-Vector subVectors(Vector a, Point b) {
-	
-
-	return Vector((b.x-a.x),(b.y-a.y),(b.z-a.z));
-
-}
-
 Vector multVectors(Vector a, Vector b) {
 
 	return Vector((a.x*b.x),(a.y*b.y),(a.z*b.z));
@@ -120,3 +113,17 @@ double dotVectors(Vector a, Vector b) {
 	return ((a.x*b.x) + (a.y*b.y) + (a.z*b.z));
 
 }
+
+
+Vector converToVector(Point a) {
+	return Vector(a.x,a.y,a.z);
+
+
+}
+
+Point convertToPoint(Vector a) {
+	return Point(a.x,a.y,a.z);
+
+}
+
+

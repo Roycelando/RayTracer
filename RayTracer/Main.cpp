@@ -28,12 +28,12 @@ Camera cam = Camera(0,0,1);
 pixel frameBuffer[(width*height)];
 pixel p = pixel(0, 0, 1);
 
-Material m = Glass(p);
+Material m = Rubber(p);
 
 
 
-Sphere* sphere = new Sphere(3, Point(0,0,-5));
-Sphere* sphere2 = new Sphere(10, Point(2,0,-15),m);
+Sphere* sphere = new Sphere(2, Point(0,0,-3));
+Sphere* sphere2 = new Sphere(5, Point(-8,0,-15),m);
 Light light = Light();
 
 
@@ -90,8 +90,11 @@ void raytrace(pixel* frameBuffer) {
 			if (scene.intersect(ray,ri,normal,tclose,tfar,hit)) {
 
 				//std::cout << "tclose: " << tclose << std::endl;
+				
 
-				double I = scene.getLightIntensity(hit);
+				Point hitPoint = convertToPoint(ray.getDistanceT(tclose));
+
+				double I = scene.getLightIntensity(hit,hitPoint,normal);
 				
 				double r = (hit->mat->colour->r)*I;
 				double g = (hit->mat->colour->g)*I;

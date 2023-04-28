@@ -11,7 +11,7 @@ class Scene {
 	std::vector<Light> lights;
 	double ambI;
 	
-		Scene(): ambI(1)  {}
+		Scene(): ambI(0.3)  {}
 
 		Scene(double ambi) : ambI(ambi) {}
 
@@ -54,14 +54,29 @@ class Scene {
 	}
 
 
-	inline double getLightIntensity(Shape* & hit) {
+	inline double getLightIntensity(Shape* & hit,Point hitPoint, Vector normal) {
 		double Iamb = 0;
 		double Idiff =0;
 		double Ispec=0;
 
+
+
 		for (int i = 0; i < lights.size(); i++) {
-			Iamb += (ambI * hit->mat->ambR);
-				
+			//abmient light
+				Iamb += (ambI * hit->mat->ambR);
+
+			//diffuse light
+			Vector ray = converToVector(subPoints(lights[i].position, hitPoint));
+			ray.normalizeVector();
+			double cosTheta = dotVectors(ray, normal);
+
+			//	ray.printVector();
+			//	normal.printVector();
+
+
+
+			Idiff += (lights[i].intensity * hit->mat->diffR * cosTheta);
+
 
 		}
 

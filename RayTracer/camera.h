@@ -26,6 +26,7 @@ public:
 
 	Camera(Point origin): right(1,0,0), up(0,1,0), forward(0,0,1){
 		this->origin = origin;
+		focalDistance = abs(origin.z);
 
 	}
 
@@ -40,6 +41,7 @@ public:
 		Vector rayDir;
 		double uc = W * (valc - 1);
 		Vector u = multVectors(right, uc);
+
 
 		double vr = H * (valr - 1);
 		Vector v = multVectors(up, vr);

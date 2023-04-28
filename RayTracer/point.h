@@ -4,10 +4,7 @@ class Point {
 	public:
 
 		double x, y, z;
-		Point() {
-			x = 0;
-			y = 0; 
-			z = 0;
+		Point():x(0),y(0),z(0){
 		}
 		Point(double x, double y, double z) {
 			this->x = x; 
@@ -29,12 +26,3 @@ class Point {
 		 return Point(a.x-b.x, a.y-b.y, a.z-b.z);
 
 	}
-
-	/*
-	Vector subPointsAndGetVector(Point a, Point b) {
-
-		 return Vector(a.x-b.x, a.y-b.y, a.z-b.z);
-
-	}
-	
-	*/
