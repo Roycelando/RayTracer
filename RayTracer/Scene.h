@@ -35,7 +35,7 @@ class Scene {
 
 	}
 
-	inline bool intersect(Ray& ray, Point& rayInt, Vector& rayNorm, double tclose, double tfar,Shape* & hitObject) {
+	inline bool intersect(Ray& ray, Point& rayInt, Vector& rayNorm, double& tclose, double& tfar,Shape* & hitObject) {
 		bool hitSomething = false;
 		for (int i = 0; i < objects.size(); i++) {
 			if (objects[i]->intersect(ray, rayInt, rayNorm, tclose, tfar, hitObject, objects[i])) {
@@ -50,6 +50,24 @@ class Scene {
 			return true;
 
 		return false;
+
+	}
+
+
+	inline double getLightIntensity(Shape* & hit) {
+		double Iamb = 0;
+		double Idiff =0;
+		double Ispec=0;
+
+		for (int i = 0; i < lights.size(); i++) {
+			Iamb += (ambI * hit->mat->ambR);
+				
+
+		}
+
+
+
+		return Iamb+Idiff+Ispec;
 
 	}
 

@@ -60,7 +60,7 @@ class Sphere: public Shape {
 
 		}
 
-			Sphere (double radius, Point origin, Material m){
+			Sphere (double radius, Point origin, Material& m){
 				this->radius = radius;
 				this->origin = origin;
 				mat = &m;
@@ -97,10 +97,11 @@ class Sphere: public Shape {
 
 			double t =-1;
 
-			if (t0 >=0.1)
-				t = t0;
+			if (t0 >= 0.1 && t1 >= 0.1)
+				(t0 <= t1) ? t = t0 : t = t1;
 			else
-				t = t1;
+				(t0 >= 0.1) ? t = t0 : t = t1;
+
 
 			 if(t> tfar || t > tclose) 
 				 return false;
