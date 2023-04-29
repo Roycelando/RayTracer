@@ -32,8 +32,12 @@ class Shape {
 		}
 
 
-		virtual bool intersect(Ray& ray , Point& ri, Vector& normal, double& tclose, double& tfar, Shape* & hit, Shape* & curObj) {
+		virtual inline bool intersect(Ray& ray , Point& ri, Vector& normal, double& tclose, double& tfar, Shape* & hit, Shape* & curObj) {
 			//std::cout << "is my hunc corrcect?" << std::endl;
+			return false;
+		}
+
+		virtual	inline bool quickIntersect(Ray& ray, double tfar) {
 			return false;
 		}
 
@@ -97,10 +101,10 @@ class Sphere: public Shape {
 
 			double t =-1;
 
-			if (t0 >= 0.1 && t1 >= 0.1)
+			if (t0 >= 0.000001 && t1 >= 0.0000001)
 				(t0 <= t1) ? t = t0 : t = t1;
 			else
-				(t0 >= 0.1) ? t = t0 : t = t1;
+				(t0 >= 0.0000001) ? t = t0 : t = t1;
 
 
 			 if(t> tfar || t > tclose) 
@@ -132,6 +136,39 @@ class Sphere: public Shape {
 
 			return true;
 
+		}
+	inline bool quickIntersect(Ray& ray, double tfar) override {
+			// A^2t + Bt +C = 0 
+			Vector rayDir = ray.getDirection();
+			Point rayOrigin = ray.getOrigin();
+			rayDir.normalizeVector();
+
+			//std::cout << "rdx: " << rayDir.x << " rdy: " << rayDir.y << " rdz: " << rayDir.z << std::endl;
+
+			double A = pow(rayDir.x, 2) + pow(rayDir.y, 2) + pow(rayDir.z,2);
+			double B = 2 * ( (rayDir.x*(rayOrigin.x-origin.x)) + (rayDir.y*(rayOrigin.y-origin.y)) + (rayDir.z*(rayOrigin.z-origin.z)) );
+			double C = pow((rayOrigin.x - origin.x), 2) + pow((rayOrigin.y - origin.y), 2) + pow((rayOrigin.z - origin.z), 2) - pow(radius, 2);
+
+			//std::cout << "A: " << A << " B: " << B << " C: " << C << std::endl;
+
+			double Disc = pow(B, 2) - (4 * C);
+
+			//std::cout << "Disc: " << Disc << std::endl;
+
+			if (Disc < 0)
+				return false;
+			
+			double t0 = (- B - sqrt((B * B) - (4 * C))) / 2.0;
+			double t1 = (- B + sqrt((B * B) - (4 * C))) / 2.0;
+
+			//std::cout << "t0: " << t0 << " t1: " << t1 << std::endl;
+
+			if ((t0 < 0.1) && (t1 < 0.1))
+				return false;
+			else
+				return true;
+
+			
 		}
 
 	private:

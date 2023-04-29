@@ -6,7 +6,7 @@ public:
 	Point position;
 	double intensity;
 
-	Light() :position(0, 2, -9), intensity(1) {}
+	Light() :position(10,10, 3), intensity(2) {}
 	Light(Point pos, double inten):position(pos), intensity(inten) {}
 
 

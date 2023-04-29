@@ -26,15 +26,19 @@ Scene scene =  Scene();
 Camera cam = Camera(0,0,1);
 
 pixel frameBuffer[(width*height)];
-pixel p = pixel(0, 0, 1);
+pixel p = pixel(1, 0, 1);
 
 Material m = Rubber(p);
 
 
 
-Sphere* sphere = new Sphere(2, Point(0,0,-3));
-Sphere* sphere2 = new Sphere(5, Point(-8,0,-15),m);
+Sphere* sphere = new Sphere(2, Point(-2,0,-3));
+Sphere* sphere2 = new Sphere(1.5, Point(1.3,0,-2),m);
 Light light = Light();
+Point pos = Point(0, 5, 5);
+Light light2 = Light(pos,1);
+
+
 
 
 // viewport
@@ -44,10 +48,11 @@ double W = H * aspectRatio;
 
 int main() {
 	//std::cout << "r: " << sphere->mat->colour->r << " g: " << sphere->mat->colour->g<< " b: " << sphere->mat->colour->b<< std::endl;
-	std::cout << " ambient ratio: " << sphere->mat->ambR << std::endl;
+//	std::cout << " ambient ratio: " << sphere->mat->ambR << std::endl;
 	scene.addObjects(sphere2);
 	scene.addObjects(sphere);
 	scene.addLights(light);
+	scene.addLights(light2);
 
 
 	
@@ -94,7 +99,9 @@ void raytrace(pixel* frameBuffer) {
 
 				Point hitPoint = convertToPoint(ray.getDistanceT(tclose));
 
-				double I = scene.getLightIntensity(hit,hitPoint,normal);
+				double I = std::min((double)scene.getLightIntensity(hit,hitPoint,normal,ray),(double)1);
+				//if(I>0.9)
+				//	std::cout << "I: "<< I << std::endl;
 				
 				double r = (hit->mat->colour->r)*I;
 				double g = (hit->mat->colour->g)*I;
@@ -134,9 +141,9 @@ void saveImage() {
 		
 		pixel p = frameBuffer[i];
 
-		int r = (int)(p.r * 255.9)%256;
-		int g = (int)(p.g * 255.9)%256;
-		int b = (int)(p.b * 255.9)%256;
+		unsigned int r = (int)(p.r * 255.999);
+		unsigned int g = (int)(p.g * 255.999);
+		unsigned int b = (int)(p.b * 255.999);
 
 
 		file << r << ' ' << g << ' ' << b << '\n';
