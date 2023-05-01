@@ -9,12 +9,15 @@
 #include "scene.h"
 #include"lights.h"
 #include<limits>
+#include<algorithm>
+#define background  pixel(0.2,0.7,0.8);
 
 
 // function defitiion
 void saveImage();
-void raytrace(pixel* frameBuffer);
+void colourPixel(pixel* frameBuffer);
 void printPixels(pixel* frameBuffer);
+pixel rayTrace(Ray ray, double depth);
 
 //global variables
 const int width = 1024;
@@ -27,15 +30,23 @@ Camera cam = Camera(0,0,1);
 
 pixel frameBuffer[(width*height)];
 pixel p = pixel(1, 0, 1);
+pixel p2 = pixel(1, 1, 1);
+pixel p3 = pixel(1, 1, 0);
 
 Material m = Rubber(p);
+Material m2 = Rubber(p2);
+Material m3 = Rubber(p3);
 
 
 
-Sphere* sphere = new Sphere(2, Point(-2,0,-3));
-Sphere* sphere2 = new Sphere(1.5, Point(1.3,0,-2),m);
+
+Sphere* sphere = new Sphere(1, Point(-2,0,-5));
+Sphere* sphere2 = new Sphere(1, Point(2,0,-5),m);
+Sphere* sphere3 = new Sphere(1, Point(0,1,-8),m2);
+Sphere* sphere4 = new Sphere(1, Point(0,-3,-6),m3);
+
 Light light = Light();
-Point pos = Point(0, 5, 5);
+Point pos = Point(0, 0, -6);
 Light light2 = Light(pos,1);
 
 
@@ -49,9 +60,13 @@ double W = H * aspectRatio;
 int main() {
 	//std::cout << "r: " << sphere->mat->colour->r << " g: " << sphere->mat->colour->g<< " b: " << sphere->mat->colour->b<< std::endl;
 //	std::cout << " ambient ratio: " << sphere->mat->ambR << std::endl;
-	scene.addObjects(sphere2);
 	scene.addObjects(sphere);
-	scene.addLights(light);
+	scene.addObjects(sphere2);
+	scene.addObjects(sphere3);
+	scene.addObjects(sphere4);
+
+
+//	scene.addLights(light);
 	scene.addLights(light2);
 
 
@@ -59,77 +74,129 @@ int main() {
 
 
 	
-	raytrace(frameBuffer);
+	colourPixel(frameBuffer);
 	saveImage();
 
 		return 0;
 }
 
 
+	pixel rayTrace(Ray ray, double depth) {
+		double tfar = std::numeric_limits<double>::max();
+		double tclose = std::numeric_limits<double>::max();
+		Shape* hit;
 
-/*
-* This method fills the frame buffer with the colour of our background
-*/
-void raytrace(pixel* frameBuffer) {
-	double tfar = std::numeric_limits<double>::max();
-	double tclose = std::numeric_limits<double>::max();
-	Shape* hit;
+		Point ri;
+		Vector normal;
+		pixel local;
+		pixel ref = pixel(0,0,0);
+		pixel refrac = pixel(0,0,0);
+		hit = new Shape();
 
-	for (int i = 0; i < height; i++ ) {
-		for (int j = 0; j < width; j++) {
+		if (depth > 4) {
 
-			double valc = 2 * j / ((double)width-1);
-			double valr = 2 * i / ((double)height-1);
+			return background;
 
-			Ray ray = cam.castRay(W,H,valc,valr);
+		}
 
-		//	printVector(ray.getDirection());
-
-			Point ri;
-			Vector normal;
-			pixel p;
-
-			tclose = std::numeric_limits<double>::max();
-			hit = new Shape();
+		else {
 
 			if (scene.intersect(ray,ri,normal,tclose,tfar,hit)) {
 
 				//std::cout << "tclose: " << tclose << std::endl;
 				
 
-				Point hitPoint = convertToPoint(ray.getDistanceT(tclose));
+				Point hitPoint = ri;
 
-				double I = std::min((double)scene.getLightIntensity(hit,hitPoint,normal,ray),(double)1);
-				//if(I>0.9)
-				//	std::cout << "I: "<< I << std::endl;
-				
+	//				double I = std::min(scene.getLightIntensity(hit,hitPoint,normal,ray),(double)1.0);
+				double I = std::min(std::max(scene.getLightIntensity(hit, hitPoint, normal, ray),(double)0),(double)1);
+
 				double r = (hit->mat->colour->r)*I;
 				double g = (hit->mat->colour->g)*I;
 				double b = (hit->mat->colour->b)*I;
-				
-				
-;			
-				p = { r,g,b};
 
-		//		std::cout << hit.mat.name << std::endl;
+				local = pixel(r,g,b);
 
-			//	std::cout << "tclose: " << tclose << std::endl;
 
+				//reflection
+					ray.getDirection().normalizeVector();
+					Vector dirRef = getRefelction(ray.getDirection(),normal);
+
+
+					dirRef.normalizeVector();
+					Point hitt = addPoints(hitPoint,(0.0001));
+
+					Ray  reflect = Ray(dirRef,hitt);
+			
+
+
+				if (hit->mat->reflec>0) {
+					
+					ref = rayTrace(reflect,++depth);
+
+
+					/*
+					ref.r = std::max(std::min((double)ref.r, (double)1),(double)0);
+					ref.g = std::max(std::min((double)ref.g, (double)1),(double)0);
+					ref.b = std::max(std::min((double)ref.b, (double)1),(double)0);
+					
+					*/
+
+					ref.g = std::min(std::max((double)ref.g, (double)0),(double)1);
+					ref.g = std::min(std::max((double)ref.g, (double)0),(double)1);
+					ref.b = std::min(std::max((double)ref.b, (double)0),(double)1);
+					ref = multPixels(ref, 0.4);
+
+
+
+				}
+
+
+
+
+			//refration
+			pixel result = 	addPixels(local, ref);
+			result.r = std::min(std::max(result.r, (double)0), (double)1);
+			result.g = std::min(std::max(result.g, (double)0), (double)1);
+			result.b = std::min(std::max(result.b, (double)0), (double)1);
+
+				return result;
 			}
 
 			else {
-				double r = i / (double)(height-1);
-				double g = j / (double)(width-1);
-				double b = 0.25;
-				p = { r,g,b};
+			
+				return background	
+			}
+
 
 		}
 
-			frameBuffer[(i * width) + j] = p;
+	}
+
+	
+
+
+
+
+
+/*
+* This method fills the frame buffer with the colour of our background
+*/
+void colourPixel(pixel* frameBuffer) {
+	
+	for (int i = 0; i < height; i++ ) {
+		for (int j = 0; j < width; j++) {
+			double depth = 0;
+
+			double valc = 2 * j / ((double)width-1);
+			double valr = 2 * i / ((double)height-1);
+
+			Ray ray = cam.castRay(W,H,valc,valr);
+	
+			frameBuffer[(i * width) + j] = rayTrace(ray,depth);
 			
 		}
 
-	//	std::cout<<std::endl<<std::endl;
 	}
 
 }

@@ -79,11 +79,29 @@ Vector subVectors(Vector a, Vector b) {
 	return Vector((a.x-b.x),(a.y-b.y),(a.z-b.z));
 
 }
+Vector subVectors(Vector a, Point b) {
+
+	return Vector((a.x-b.x),(a.y-b.y),(a.z-b.z));
+
+}
+
+Vector subPointsV(Point a, Point b) {
+
+	return Vector((a.x-b.x),(a.y-b.y),(a.z-b.z));
+
+}
 
 Vector subVectors(Vector a, double b) {
 	
 
 	return Vector((a.x-b),(a.y-b),(a.z-b));
+
+}
+
+Vector subVectors(double a, Vector b) {
+	
+
+	return Vector((a-b.x),(a-b.y),(a-b.z));
 
 }
 
@@ -115,14 +133,34 @@ double dotVectors(Vector a, Vector b) {
 }
 
 
-Vector converToVector(Point a) {
-	return Vector(a.x,a.y,a.z);
+Vector converToVectorP(Point o , Vector d) {
+	return Vector(o.x+d.x,o.y+d.y,o.z+d.z);
 
+}
+
+Vector convertToVector(Vector a) {
+	return Vector(a.x,a.y,a.z);
 
 }
 
 Point convertToPoint(Vector a) {
 	return Point(a.x,a.y,a.z);
+
+}
+
+
+Vector getRefelction(Vector i, Vector n) {
+	i.normalizeVector();
+	n.normalizeVector();
+
+	double co = -2 * dotVectors(n,i);
+
+	Vector vec = multVectors(n, co);
+	vec.normalizeVector();
+
+	return addVectors(i, vec);
+
+
 
 }
 

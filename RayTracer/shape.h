@@ -37,7 +37,7 @@ class Shape {
 			return false;
 		}
 
-		virtual	inline bool quickIntersect(Ray& ray, double tfar) {
+		virtual	inline bool quickIntersect(Ray& ray, double tclose,double tfar) {
 			return false;
 		}
 
@@ -96,15 +96,22 @@ class Sphere: public Shape {
 
 			//std::cout << "t0: " << t0 << " t1: " << t1 << std::endl;
 
-			if ((t0 < 0.1) && (t1 < 0.1))
+		/*
+		
+			if ((t0 < 0) && (t1 < 0))
 				return false;
+		*/
+			
+			
 
 			double t =-1;
 
-			if (t0 >= 0.000001 && t1 >= 0.0000001)
-				(t0 <= t1) ? t = t0 : t = t1;
+			if (t0 > 0.001)
+				t = t0;
+			else if (t1 > 0.001)
+				t = t1;
 			else
-				(t0 >= 0.0000001) ? t = t0 : t = t1;
+				return false;
 
 
 			 if(t> tfar || t > tclose) 
@@ -137,7 +144,7 @@ class Sphere: public Shape {
 			return true;
 
 		}
-	inline bool quickIntersect(Ray& ray, double tfar) override {
+	inline bool quickIntersect(Ray& ray, double tclose, double tfar) override {
 			// A^2t + Bt +C = 0 
 			Vector rayDir = ray.getDirection();
 			Point rayOrigin = ray.getOrigin();
@@ -157,16 +164,24 @@ class Sphere: public Shape {
 
 			if (Disc < 0)
 				return false;
-			
+
 			double t0 = (- B - sqrt((B * B) - (4 * C))) / 2.0;
 			double t1 = (- B + sqrt((B * B) - (4 * C))) / 2.0;
 
-			//std::cout << "t0: " << t0 << " t1: " << t1 << std::endl;
-
-			if ((t0 < 0.1) && (t1 < 0.1))
-				return false;
-			else
+			if (t0 > 0.001) {
 				return true;
+
+			}
+
+			if (t1 > 0.001) {
+
+				return true;
+			}
+
+
+
+		
+			return false;
 
 			
 		}

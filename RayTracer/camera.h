@@ -44,7 +44,7 @@ public:
 
 
 		double vr = H * (valr - 1);
-		Vector v = multVectors(up, vr);
+		Vector v = multVectors(up, -vr);
 
 		Vector n = multVectors(forward, -focalDistance);
 

@@ -14,7 +14,7 @@ public:
 	std::vector<Light> lights;
 	double ambI;
 
-	Scene() : ambI(0.5) {}
+	Scene() : ambI(1) {}
 
 	Scene(double ambi) : ambI(ambi) {}
 
@@ -55,6 +55,18 @@ public:
 		return false;
 
 	}
+	
+	inline bool intesectsScene(Ray r) {
+		double tfar=std::numeric_limits<double>::max();
+		double tclose=std::numeric_limits<double>::max();
+
+		for (int i = 0; i < objects.size(); i++) {
+			if (objects[i]->quickIntersect(r,tclose,tfar))
+				return true;
+
+		}
+
+	}
 
 
 	inline double getLightIntensity(Shape*& hit, Point hitPoint, Vector normal, Ray& rayI) {
@@ -62,52 +74,61 @@ public:
 		double Idiff = 0;
 		double Ispec = 0;
 		double tfar=std::numeric_limits<double>::max();
+		rayI.getDirection().normalizeVector();
 
 
 
 		for (int i = 0; i < lights.size(); i++) {
-			//diffuse light
-			Vector ray = converToVector(subPoints(lights[i].position, hitPoint));
+			Vector ray = subPointsV(lights[i].position,hitPoint);
 			ray.normalizeVector();
-			Ray shadowRay = Ray(ray, hit->origin);
 
-			for (int j = 0; j < objects.size(); j++) {
-				if (objects[j]->quickIntersect(shadowRay, tfar)) {
-					std::cout << "shadow ray time" << std::endl;
-					continue;
-				}
 
 			//abmient light
 
 			Iamb += (ambI * hit->mat->ambR);
 
+			// shadow
+/*
 
+			for (int j = 0; j < objects.size(); j++) {
+				double tclose = tfar;
+				Ray shadowRay = Ray(ray, addPoints(hitPoint,0.1));
+				shadowRay.getDirection().normalizeVector();
 
+				if (objects[j]->quickIntersect(shadowRay,tclose,tfar)) 
+					continue;
+				
+			}
 
+*/
+			
+			
+			
+		
+		
+			
+		
+
+				//diffuse light
 				normal.normalizeVector();
-				double cosTheta = (double)dotVectors(ray, normal);
+				double specAngle = (double)dotVectors(ray, normal);
 
-
-				Idiff += (lights[i].intensity * std::max((double)cosTheta, (double)0.0)) * hit->mat->diffR;
+				Idiff += (lights[i].intensity * std::max((double)specAngle, (double)0.0)) * hit->mat->diffR;
 
 				//specular  light
 
-				Vector rayOpp = multVectors(ray, -1);
-				rayOpp.normalizeVector();
-				double cosThetaOpp = (double)dotVectors(rayOpp, normal);
+				Vector negRay = multVectors(ray, -1);
+				
+				Vector reflection = getRefelction(negRay,normal);
+				reflection.normalizeVector();
+
+				Vector negIncident = multVectors(rayI.getDirection(),-1);
+				negIncident.normalizeVector();
+
+				double cosBeta = std::max(dotVectors(reflection,negIncident),0.0);
 
 
-
-				double val = 2 * cosThetaOpp;
-				Vector vec = multVectors(normal, val);
-
-				Vector reflect = subVectors(rayOpp, vec);
-				reflect.normalizeVector();
-
-				double cosBeta = dotVectors(reflect, rayI.getDirection());
-
-
-				Ispec += lights[i].intensity * (hit->mat->specR) * pow(std::max(cosBeta, 0.0), hit->mat->specH);
+				Ispec += lights[i].intensity * (hit->mat->specR) * pow(cosBeta, hit->mat->specH);
 
 				//			std::cout << "Iamb: " << Iamb <<" Idiff: "<< Idiff <<" Ispec: "<< Ispec << std::endl;
 
@@ -118,7 +139,7 @@ public:
 
 
 
-			return Iamb + Idiff + Ispec;
+			return (Iamb + Idiff + Ispec)/lights.size();
 
 		}
 
@@ -126,5 +147,4 @@ public:
 
 
 
-	}
 };
