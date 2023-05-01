@@ -2,11 +2,12 @@
 #include"pixel.h"
 #include<iostream>
 
+/*
+	Defines material for shapes
+*/
 
 class Material {
 	public:
-		
-		std::string name;
 		//colour
 		double ambR;
 		double diffR;
@@ -30,9 +31,7 @@ class Material {
 			colour = new pixel(1,0,0);
 		}
 
-
 };
-
 
 
 class Rubber : public Material {
@@ -42,12 +41,11 @@ class Rubber : public Material {
 		ambR = 0.3;
 		diffR = 0.6;
 		specR = 0.6;
-		specH = 50;
+		specH = 20;
 		colour = &c;
-		reflec = 0.8;
-		refrac = 0.5;
+		reflec = 0;
+		refrac = 0;
 
-		name = "rubber";
 
 	}
 
@@ -56,10 +54,9 @@ class Rubber : public Material {
 		ambR = 0.3;
 		diffR = 0.6;
 		specR = 0.6;
-		specH = 50;
-		name = "rubber";
-		reflec = 0.8;
-		refrac = 0.5;
+		specH = 20;
+		reflec = 0;
+		refrac = 0;
 
 
 	}
@@ -71,21 +68,27 @@ class Glass : public Material {
 
 public:
 	Glass(pixel &c){
-		ambR = 0.6;
-		diffR = 0.6;
-		specR = 0.9;
-		specH = 1;
+		ambR = 0.4;
+		diffR = 0.4;
+		specR = 0.4;
+		specH = 50;
+		reflec = 1;
+		refrac = 0.3;
+
+
 		colour = &c;
-		name = "glass";
 	}
 
 	Glass(){
-		colour = new pixel(1, 0, 0);
-		ambR = 0.6;
-		diffR = 0.6;
-		specR = 0.9;
-		specH = 1;
-		name = "glass";
+		colour = new pixel(0.2, 0.1, 0.8);
+		ambR = 0.4;
+		diffR = 0.4;
+		specR = 0.4;
+		specH = 50;
+		reflec = 1;
+		refrac = 0.3;
+
+
 
 	}
 

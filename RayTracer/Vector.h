@@ -2,6 +2,10 @@
 #include<cmath>
 #include"point.h"
 
+/*
+	Defines my vector and a bunch of useful operations
+*/
+
 class Vector {
 	public:
 		double x, y, z;
@@ -138,7 +142,7 @@ Vector converToVectorP(Point o , Vector d) {
 
 }
 
-Vector convertToVector(Vector a) {
+Vector convertToVector(Point a) {
 	return Vector(a.x,a.y,a.z);
 
 }
@@ -148,7 +152,9 @@ Point convertToPoint(Vector a) {
 
 }
 
-
+/*
+Gets the reflection vector
+*/
 Vector getRefelction(Vector i, Vector n) {
 	i.normalizeVector();
 	n.normalizeVector();

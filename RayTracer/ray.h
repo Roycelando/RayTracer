@@ -2,6 +2,9 @@
 #include "vector.h"
 #include "point.h"
 
+/*
+	Defiens my light rays
+*/
 class Ray {
 		Vector dir; // Ray direction
 		Point origin; // Ray origin

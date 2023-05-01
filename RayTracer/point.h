@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+	Defines point which are defined by x,y,z coordianates
+*/
+
 class Point {
 	public:
 

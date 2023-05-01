@@ -7,9 +7,12 @@
 #include <cmath>
 #include<algorithm>
 
+/*
+	A scene has a list of lighets and shapes, are rendered in the ray tracer
+*/
+
 class Scene {
 public:
-	//std::cout << "theta: " << cosTheta << std::endl<<std::endl;
 	std::vector<Shape*> objects;
 	std::vector<Light> lights;
 	double ambI;
@@ -42,7 +45,6 @@ public:
 		bool hitSomething = false;
 		for (int i = 0; i < objects.size(); i++) {
 			if (objects[i]->intersect(ray, rayInt, rayNorm, tclose, tfar, hitObject, objects[i])) {
-				//	std::cout << "for loop of intersection" << std::endl;
 				hitSomething = true;
 			}
 
@@ -56,29 +58,20 @@ public:
 
 	}
 	
-	inline bool intesectsScene(Ray r) {
-		double tfar=std::numeric_limits<double>::max();
-		double tclose=std::numeric_limits<double>::max();
 
-		for (int i = 0; i < objects.size(); i++) {
-			if (objects[i]->quickIntersect(r,tclose,tfar))
-				return true;
-
-		}
-
-	}
-
-
+/*
+This method is used for phong shading, gets ambient, diffuse, and specular lighting intensity
+*/
 	inline double getLightIntensity(Shape*& hit, Point hitPoint, Vector normal, Ray& rayI) {
 		double Iamb = 0;
 		double Idiff = 0;
 		double Ispec = 0;
-		double tfar=std::numeric_limits<double>::max();
+		bool lightMe = true;
 		rayI.getDirection().normalizeVector();
 
-
-
+		// calculated for each light in the scene 
 		for (int i = 0; i < lights.size(); i++) {
+			lightMe = true;
 			Vector ray = subPointsV(lights[i].position,hitPoint);
 			ray.normalizeVector();
 
@@ -88,26 +81,31 @@ public:
 			Iamb += (ambI * hit->mat->ambR);
 
 			// shadow
-/*
 
 			for (int j = 0; j < objects.size(); j++) {
-				double tclose = tfar;
-				Ray shadowRay = Ray(ray, addPoints(hitPoint,0.1));
-				shadowRay.getDirection().normalizeVector();
+				Vector lightDist = subPointsV(lights[i].position,hitPoint);
+				double lightD = lightDist.magnitude();
 
-				if (objects[j]->quickIntersect(shadowRay,tclose,tfar)) 
-					continue;
+	
+				Ray shadowRay = Ray(ray, addPoints(hitPoint,0.0001));
+				shadowRay.getDirection().normalizeVector();
+				Point inter = Point();
+
+				if (objects[j]->intersect(shadowRay, inter)) {
+
+					Vector vecDist = subPointsV(lights[i].position,inter);
+					double dist = vecDist.magnitude();
+					if (dist < lightD) {
+						lightMe = false;
+						break;
+					}
+				}
 				
 			}
 
-*/
-			
-			
-			
-		
-		
-			
-		
+			if (!lightMe)
+				continue;
+
 
 				//diffuse light
 				normal.normalizeVector();
@@ -130,7 +128,6 @@ public:
 
 				Ispec += lights[i].intensity * (hit->mat->specR) * pow(cosBeta, hit->mat->specH);
 
-				//			std::cout << "Iamb: " << Iamb <<" Idiff: "<< Idiff <<" Ispec: "<< Ispec << std::endl;
 
 
 
@@ -139,7 +136,7 @@ public:
 
 
 
-			return (Iamb + Idiff + Ispec)/lights.size();
+			return (Iamb + Idiff + Ispec)/lights.size(); //avg the intensity for each light soruce
 
 		}
 

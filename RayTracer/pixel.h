@@ -1,9 +1,12 @@
 #pragma once
 
+/*
+		Defines my pixles
+*/
 typedef struct pixel {
 	double r, g, b;
 
-	pixel() : r(1), g(0), b(0) {}
+	pixel() : r(0), g(0), b(0) {}
 
 	pixel(double rr, double gg, double bb) : r(rr), g(gg), b(bb) {}
 
@@ -14,7 +17,6 @@ typedef struct pixel {
 pixel addPixels(pixel a, pixel b) {
 
 	return pixel((a.r + b.r),( a.g + b.g), (a.b + b.b));
-
 
 }
 
