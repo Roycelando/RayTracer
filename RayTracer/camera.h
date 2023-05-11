@@ -6,6 +6,9 @@
 #include<math.h>
 #define PI 3.14159265358979323846
 
+/*
+defines my camera
+*/
 
 class Camera {
 public:
@@ -35,7 +38,7 @@ public:
 		
 		calculation came from 	page 735 of [A.S. Glassner. An Introduction to Ray Tracing. Academic Press, 1989]
 
-		don't full get it but it works!
+		don't fully get it but it works!
 	*/
 	inline Ray castRay (double W, double H, double valc, double valr) {
 		Vector rayDir;

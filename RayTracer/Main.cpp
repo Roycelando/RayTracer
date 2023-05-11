@@ -10,7 +10,7 @@
 #include"lights.h"
 #include<limits>
 #include<algorithm>
-#define background  pixel(0.2,0.7,0.8);
+#define background  pixel(0.00078,0.1411,1);
 #define background  pixel(0,0,0);
 
 
@@ -57,7 +57,7 @@ Sphere* sphere4 = new Sphere(3, Point(0,5,-20),m4);
 
 //Sphere* sphere3 = new Sphere(1, Point(0,1,-8),m2);
 
-Point pos = Point(7, 5, 2);
+Point pos = Point(-7, 5, -10);
 Point pos2 = Point(0, -2, -20);
 Point pos3 = Point(0, 5, -10);
 Point pos4 = Point(0, 5, 3);
@@ -84,7 +84,7 @@ int main() {
 
 //placing lights
 	scene.addLights(light);
-	scene.addLights(light2);
+//	scene.addLights(light2);
 
 //	scene.addLights(light3);
 //	scene.addLights(light4);
@@ -147,7 +147,7 @@ int main() {
 					ray.getDirection().normalizeVector();
 					Vector dirRef = getRefelction(ray.getDirection(),normal);
 					dirRef.normalizeVector();
-					Point hitt = addPoints(hitPoint,(0.00011));
+					Point hitt = addPoints(hitPoint,(0.0001));
 
 					Ray  reflect = Ray(dirRef,hitt);
 					
@@ -163,6 +163,7 @@ int main() {
 
 				}
 
+			//refration
 				double nt = hit->mat->refrac;
 
 				if (nt>0) {
@@ -201,7 +202,6 @@ int main() {
 
 
 
-			//refration
 			pixel result = 	addPixels(addPixels(local, ref),refrac);
 			result.r = std::min(std::max(result.r, (double)0), (double)1);
 			result.g = std::min(std::max(result.g, (double)0), (double)1);
