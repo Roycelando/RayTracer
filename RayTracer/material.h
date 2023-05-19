@@ -3,98 +3,101 @@
 #include<iostream>
 
 /*
-	Defines material for shapes
-*/
 
+	Defines material for shapes
+	
+*/
 class Material {
 	public:
 		//colour
+		pixel colour;
+
+		//lighting ratio 
 		double ambR;
 		double diffR;
 		double specR;
+
+		// specular thingy
 		double specH;
-		pixel* colour;
 
 		// refelction and refraction coeficients 
 		double reflec;
 		double refrac;
 
 		 Material() : ambR(1), diffR(1), specR(1), specH(1), reflec(0.3), refrac(0.3){
-			colour = new pixel(1,0,0);
+			colour = pixel(1,0,0);
 		}
 
-		Material(double amb, double diff, double spec, pixel c) : ambR(amb), diffR(diff), specR(spec),specH(1){
-			colour = new pixel(1,0,0);
+		 Material(pixel &colour) : ambR(1), diffR(1), specR(1), specH(1), reflec(0.3), refrac(0.3){
+			 this->colour = colour;
 		}
 
-		Material(double amb, double diff, double spec, pixel c, double reflec, double refrac) : ambR(amb), diffR(diff), specR(spec),specH(1), reflec(reflec), refrac(refrac){
-			colour = new pixel(1,0,0);
+		 Material(pixel &colour, double ambR, double diffR, double specR, double specH, double reflec, double refrac) : 
+			 colour(colour), ambR(ambR), diffR(diffR), specR(specR), specH(specH), reflec(reflec), refrac(refrac){
+		}
+
+		Material(double r, double g, double b, double ambR, double diffR, double specR, double specH, double reflec, double refrac) : 
+			 colour(pixel(r,g,b)), ambR(ambR), diffR(diffR), specR(specR), specH(specH), reflec(reflec), refrac(refrac){
 		}
 
 };
 
-
 class Rubber : public Material {
 	public:	
 
-	Rubber(pixel &c) {
-		ambR = 0.3;
-		diffR = 0.6;
-		specR = 0.6;
-		specH = 20;
-		colour = &c;
-		reflec = 0;
-		refrac = 0;
+		pixel dColour = pixel(1,0,0);
 
+		Rubber(pixel &colour) : Material(colour, 0.3, 0.6, 0.6, 20, 0, 0) {
+		// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+		}
 
-	}
+		Rubber(double r, double g, double b) : Material(r,g,b,0.3, 0.6, 0.6, 20, 0, 0) {
+			//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 
-	Rubber(){
-		colour = new pixel(1, 0, 0);
-		ambR = 0.3;
-		diffR = 0.6;
-		specR = 0.6;
-		specH = 20;
-		reflec = 0;
-		refrac = 0;
+		}
 
-
-	}
+		Rubber() : Material(dColour, 0.3, 0.6, 0.6, 20, 0, 0) {}
 
 };
 
 
 class Glass : public Material {
+	public:
 
-public:
-	Glass(pixel &c){
-		ambR = 0.4;
-		diffR = 0.4;
-		specR = 0.4;
-		specH = 50;
-		reflec = 1;
-		refrac = 0.3;
+		pixel dColour = pixel(1,0,0);
 
+		Glass(pixel &colour) : Material(colour, 0.4, 0.4, 0.4, 50, 0, 0.2) {
+			// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 
-		colour = &c;
-	}
+		}
 
-	Glass(){
-		colour = new pixel(0.2, 0.1, 0.8);
-		ambR = 0.4;
-		diffR = 0.4;
-		specR = 0.4;
-		specH = 50;
-		reflec = 1;
-		refrac = 0.3;
+		Glass() : Material(dColour, 0.4, 0.4, 0.4, 50, 1, 0.3) {
+		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 
+		}
 
-
-	}
+		Glass(double r, double g, double b) : Material(r,g,b, 0.4, 0.4, 0.4, 50, 1, 0.3) {}
+		
 
 };
 
+
 class Metal : public Material {
+public:
+	pixel dColour = pixel(1,0,0);
+
+	Metal(pixel &colour) : Material(colour, 0.4, 0.4, 0.4, 50, 1, 0.3) {
+	// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+
+	}
+
+	Metal() : Material(dColour, 0.4, 0.4, 0.4, 50, 1, 0.3) {
+	//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+
+	}
+
+	Metal(double r, double g, double b) : Material(r, g, b, 0.4, 0.4, 0.4, 50, 1, 0.3) {}
+
 
 };
 

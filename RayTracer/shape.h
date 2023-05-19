@@ -52,12 +52,12 @@ class Sphere: public Shape {
 	public :
 			double radius;
 
-			Sphere() {
-				radius = 1.0;
-				origin = Point(0,0,-2);
-				mat = new Rubber();
+		Sphere() {
+			radius = 1.0;
+			origin = Point(0,0,-2);
+			mat = new Rubber();
 
-			}
+		}
 			
 		Sphere (double radius, Point origin){
 				this->radius = radius;
@@ -66,11 +66,11 @@ class Sphere: public Shape {
 
 		}
 
-			Sphere (double radius, Point origin, Material& m){
-				this->radius = radius;
-				this->origin = origin;
-				mat = &m;
-			}
+		Sphere (double radius, Point origin, Material& m){
+			this->radius = radius;
+			this->origin = origin;
+			mat = &m;
+		}
 
 
 		inline bool intersect(Ray& ray, Point& ri, Vector& normal,double& tclose, double& tfar,Shape* & hit, Shape* & curObj) override {
@@ -186,13 +186,11 @@ class Sphere: public Shape {
 class Plane:public Shape {
 	public :
 		double distance;
+
 		Plane(Vector norm, Point org,double distance){
 			normal = norm;
 			origin = org;
 			this->distance = distance;
-
-
-
 		}
 
 		Plane() {
@@ -203,42 +201,42 @@ class Plane:public Shape {
 
 		}
 
-inline bool intersect(Ray& ray, Point& ri, Vector& normal, double& tclose, double& tfar, Shape*& hit, Shape*& curObj) {
-	ray.getDirection().normalizeVector();
-	
+		inline bool intersect(Ray& ray, Point& ri, Vector& normal, double& tclose, double& tfar, Shape*& hit, Shape*& curObj) {
+			ray.getDirection().normalizeVector();
+			
 
-	 double PnRd = dotVectors(this->normal,ray.getDirection());
-	 //std::cout << "PnRd: " << PnRd << std::endl;
+			 double PnRd = dotVectors(this->normal,ray.getDirection());
+			 //std::cout << "PnRd: " << PnRd << std::endl;
 
-	 if (PnRd >=0) {
-		 return false;
+			 if (PnRd >=0) {
+				 return false;
 
-	 }
-
-
-	 Vector Ro = convertToVector(ray.getOrigin());
-	 Ro.normalizeVector();
-	 double t = -1*(dotVectors(this->normal, Ro) + this->distance)/ PnRd;
+			 }
 
 
-	 if (t<0 || t>tfar) 
-		 return false;
-
-	 ray.getDirection().normalizeVector();
-	 Vector r = ray.getDirection();
-	 Point o = ray.getOrigin();
-		
-	 ri = Point((o.x + (r.x*t)),(o.y+(r.y*t)),(o.z+(r.z*t)));
-	 //normal = subPointsV( addPoints(ri,(0,5,0)),ri);
-	 normal = this->normal;
-	 normal.normalizeVector();
+			 Vector Ro = convertToVector(ray.getOrigin());
+			 Ro.normalizeVector();
+			 double t = -1*(dotVectors(this->normal, Ro) + this->distance)/ PnRd;
 
 
+			 if (t<0 || t>tfar) 
+				 return false;
 
-		return true;
-	}
+			 ray.getDirection().normalizeVector();
+			 Vector r = ray.getDirection();
+			 Point o = ray.getOrigin();
+				
+			 ri = Point((o.x + (r.x*t)),(o.y+(r.y*t)),(o.z+(r.z*t)));
+			 //normal = subPointsV( addPoints(ri,(0,5,0)),ri);
+			 normal = this->normal;
+			 normal.normalizeVector();
 
-		virtual	inline bool quickIntersect(Ray& ray, Point interesect,double tfar) {
+
+
+				return true;
+		}
+
+		virtual	inline bool intersect(Ray& ray, Point interesect,double tfar) {
 
 			return false;
 		}

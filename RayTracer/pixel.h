@@ -4,11 +4,11 @@
 		Defines my pixles
 */
 typedef struct pixel {
-	double r, g, b;
+	double r,g,b;
 
 	pixel() : r(0), g(0), b(0) {}
 
-	pixel(double rr, double gg, double bb) : r(rr), g(gg), b(bb) {}
+	pixel(double r, double g, double b) : r(r), g(g), b(b) {}
 
 
 };
