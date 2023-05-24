@@ -15,6 +15,7 @@
 //#include <Commdlg.h>
 #define background  pixel(0.00078,0.1411,1);
 #define background  pixel(0,0,0);
+const double AIR	= 1.0003;
 
 
 
@@ -103,7 +104,7 @@ int main() {
 }
 
 /*
-	This method is used to tray trace
+	This method is used to ray trace
 */
 pixel rayTrace(Ray ray, double depth, double ni) {
 	double tfar = std::numeric_limits<double>::max();
@@ -116,8 +117,9 @@ pixel rayTrace(Ray ray, double depth, double ni) {
 	pixel ref = pixel(0,0,0);
 	pixel refrac = pixel(0,0,0);
 	hit = new Shape();
+	double epsilon = 0.001;
 
-	if (depth > 8) {
+	if (depth > 4) {
 
 		return background;
 
@@ -132,9 +134,8 @@ pixel rayTrace(Ray ray, double depth, double ni) {
 
 			Point hitPoint = ri;
 
-//				double I = std::min(scene.getLightIntensity(hit,hitPoint,normal,ray),(double)1.0);
-			double I = std::min(std::max(scene.getLightIntensity(hit, hitPoint, normal, ray),(double)0),(double)1);
-
+			//double I = std::min(scene.getLightIntensity(hit,hitPoint,normal,ray),(double)1.0);
+			double I = std::min((std::max(scene.getLightIntensity(hit, hitPoint, normal, ray),(double)0)),(double)1);
 			double r = (hit->mat->colour.r)*I;
 			double g = (hit->mat->colour.g)*I;
 			double b = (hit->mat->colour.b)*I;
@@ -150,10 +151,13 @@ pixel rayTrace(Ray ray, double depth, double ni) {
 				ray.getDirection().normalizeVector();
 				Vector dirRef = getRefelction(ray.getDirection(),normal);
 				dirRef.normalizeVector();
-				Point hitt = addPoints(hitPoint,(0.0001));
 
-				Ray  reflect = Ray(dirRef,hitt);
+				Point hitPointEpsilon = addPoints(hitPoint,epsilon);
+
+				Ray  reflect = Ray(dirRef,hitPointEpsilon);
+				reflect.getDirection().normalizeVector();
 				
+					
 				ref = rayTrace(reflect,++depth,hit->mat->refrac);
 
 
@@ -163,41 +167,54 @@ pixel rayTrace(Ray ray, double depth, double ni) {
 				ref = multPixels(ref, hit->mat->reflec);
 
 
-
 			}
 
-		//refration
-			double nt = hit->mat->refrac;
+		//refraction equation: T = alpha*I + beta *N, T is the transmission vector
 
-			if (nt>0) {
-				double nit = ni / nt;
-				ray.getDirection().normalizeVector();
-				Vector nitI = multVectors(ray.getDirection(),nit);
-				nitI.normalizeVector();
+			double nt = AIR;
+
+			if(ni == AIR)
+				nt = hit->mat->refrac; // material transmission
+
+			if (nt>0 || false) {
+				double nit = ni / nt; // snells law
+				ray.getDirection().normalizeVector(); // normalizing the ray just incase its not normalized yet
+				Vector nitI = multVectors(ray.getDirection(),nit); // the ray is the incident ray, so we multiply it by nit
+				nitI.normalizeVector();// normalize this new vecotr since this needs to be a unit vector
 
 
-				double Ci = dotVectors(multVectors(normal, -1), ray.getDirection());
+				double Ci = dotVectors(multVectors(normal, -1), ray.getDirection()); // Ci = cos(thea i) = N(unit vector) * -I(unit vector)
 				double nitPow = pow(nit,2);
 				double ciPow = pow(Ci,2);
+				double root = sqrt((1 + (nitPow * (ciPow - 1))));
 
-				double beta = nit * Ci - sqrt((1 + nitPow * (ciPow - 1)));
-				Vector N = multVectors(normal,beta);
+				if (root>0) {
 
+					double beta = (nit * Ci) - root;
 
-				Vector T = addVectors(nitI,N);
-				T.normalizeVector();
+					Vector N = multVectors(normal,beta); // Normal vector
+					Vector T = addVectors(nitI,N); // Transmissin vector
 
-				Ray refract = Ray(T,addPoints(hitPoint, 0.00011));
+					T.normalizeVector(); // want the unit vector of the transmison vector 
+					N.normalizeVector(); // wnat the unit vector of the normal vector 
 
-				if (ni == nt)
-					ni = 1;
+					Ray refract = Ray(T,addPoints(hitPoint, 0.011));
 
-				
-				refrac = rayTrace(refract,++depth,nt);
+					if (hit->name =="Sphere" && ni == AIR ) { 
+						refrac = rayTrace(refract,++depth,nt);
 
-				refrac.r = std::min(std::max((double)refrac.r, (double)0),(double)1);
-				refrac.g = std::min(std::max((double)refrac.g, (double)0),(double)1);
-				refrac.b = std::min(std::max((double)refrac.b, (double)0),(double)1);
+					}
+
+				//	else if (hit->name =="Sphere" && ni == hit->mat->refrac) {
+					else{
+						refrac = rayTrace(refract,++depth,AIR); 
+					}
+
+					refrac.r = std::min(std::max((double)refrac.r, (double)0),(double)1);
+					refrac.g = std::min(std::max((double)refrac.g, (double)0),(double)1);
+					refrac.b = std::min(std::max((double)refrac.b, (double)0),(double)1);
+
+				}
 
 			
 			}
@@ -237,7 +254,7 @@ void loadScene() {
 		const std::string ignore = "//";
 		std::string temp = "";
 
-		while (infile >> shape && !infile.eof()) {
+		while (!infile.eof() && infile >> shape) {
 
 			if (shape.find(ignore) != std::string::npos) {
 				std::getline(infile, temp);
@@ -267,7 +284,6 @@ void loadScene() {
 					
 					Point point = Point(x,y,z); // creates the Point object
 					pixel pix = pixel(r, g, b);
-//					(m == 'r') ? mat = Rubber(r, g, b) : (m == 'g') ? mat = Glass(r, g, b) : (m == 'm') ? mat = Metal(r, g, b) : mat = Metal(); // creates the Material object 
 					if (m == 'r') {
 
 						mat = new Rubber(pix);
@@ -304,7 +320,7 @@ void loadScene() {
 					infile >> z;
 
 					std::cout << shape << " "<< intensity<< " " << x<< " " << y << " "<< " "<< z << std::endl;
-					Light light = Light(intensity,x,y,z);
+					Light light = Light(x,y,z,intensity);
 					scene.addLights(light);
 
 
@@ -321,8 +337,6 @@ void loadScene() {
 }
 
 
-
-
 /*
 * This method fills the frame buffer with results form the ray tracer
 */
@@ -331,15 +345,14 @@ void colourPixel(pixel* frameBuffer) {
 	for (int i = 0; i < height; i++ ) {
 		for (int j = 0; j < width; j++) {
 			double depth = 0;
-			double air = 1.0;
 
-			double valc = 2 * j / ((double)width-1);
-			double valr = 2 * i / ((double)height-1);
+			double valc = 2 * j / ((double)width);
+			double valr = 2 * i / ((double)height);
 
 			Ray ray = cam.castRay(W,H,valc,valr); // casting a ray toward current pixel
 	
-			frameBuffer[(i * width) + j] = rayTrace(ray,depth,air);
-			
+			frameBuffer[(i * width) + j] = rayTrace(ray,depth,AIR); 
+
 		}
 
 	}
@@ -352,7 +365,7 @@ void colourPixel(pixel* frameBuffer) {
 void saveImage() {
 	std::ofstream file("./image.ppm");
 	file << "P3\n" << width << ' ' << height << "\n255\n";
-	for (int i = 0; i < height*width; i++) {
+	for (int i = 0; i <width*height; i++) {
 		
 		pixel p = frameBuffer[i];
 
@@ -360,17 +373,17 @@ void saveImage() {
 		unsigned int g = (int)(p.g * 255.999);
 		unsigned int b = (int)(p.b * 255.999);
 
-
 		file << r << ' ' << g << ' ' << b << '\n';
 		
 	}
-
 	
 	file.close();
 	
 }
+
 /*
-This method prints pixels in my farmnebuffer, used for debugging
+	This method prints to the consol pixels in my farmnebuffer.
+	Used for debugging
 */
 void printPixels(pixel* frameBuffer) {
 	for (int i = 0; i < height; i++) {

@@ -12,6 +12,7 @@ class Shape {
 		Point origin;
 		Vector normal;
 		Material* mat;
+		std::string name;
 		
 		Shape() {
 			origin = Point();
@@ -56,6 +57,7 @@ class Sphere: public Shape {
 			radius = 1.0;
 			origin = Point(0,0,-2);
 			mat = new Rubber();
+			name = "Sphere";
 
 		}
 			
@@ -63,6 +65,7 @@ class Sphere: public Shape {
 				this->radius = radius;
 				this->origin = origin;
 				mat = new Glass();
+				name = "Sphere";
 
 		}
 
@@ -70,6 +73,8 @@ class Sphere: public Shape {
 			this->radius = radius;
 			this->origin = origin;
 			mat = &m;
+			name = "Sphere";
+
 		}
 
 
@@ -78,6 +83,7 @@ class Sphere: public Shape {
 			Vector rayDir = ray.getDirection();
 			Point rayOrigin = ray.getOrigin();
 			rayDir.normalizeVector();
+			double epsilon = 0.0011;
 
 
 			double A = pow(rayDir.x, 2) + pow(rayDir.y, 2) + pow(rayDir.z,2);
@@ -90,7 +96,6 @@ class Sphere: public Shape {
 
 			if (Disc < 0)
 				return false;
-			
 			double t0 = (- B - sqrt((B * B) - (4 * C))) / 2.0;
 			double t1 = (- B + sqrt((B * B) - (4 * C))) / 2.0;
 
@@ -98,9 +103,9 @@ class Sphere: public Shape {
 
 			double t =-1;
 
-			if (t0 > 0.001)
+			if (t0 > epsilon)
 				t = t0;
-			else if (t1 > 0.001)
+			else if (t1 > epsilon)
 				t = t1;
 			else
 				return false;
@@ -134,6 +139,7 @@ class Sphere: public Shape {
 		}
 	inline bool intersect(Ray& ray, Point& intersect) override {
 			// A^2t + Bt +C = 0 
+			double epsilon = 0.001;
 			Vector rayDir = ray.getDirection();
 			Point rayOrigin = ray.getOrigin();
 			rayDir.normalizeVector();
@@ -154,24 +160,19 @@ class Sphere: public Shape {
 			double t1 = (- B + sqrt((B * B) - (4 * C))) / 2.0;
 			double t = -1;
 
-			if (t0 > 0.001)
+			if (t0 > epsilon)
 				t = t0;
-			else if (t1 > 0.001)
+			else if (t1 > epsilon)
 				t = t1;
 			else
 				return false;
-
 
 			double xi = rayOrigin.x + (rayDir.x * t);
 			double yi = rayOrigin.y + (rayDir.y * t);
 			double zi = rayOrigin.z + (rayDir.z * t);
 
-
 			intersect = Point(xi, yi, zi); // intersect point of the ray on the sphere
 
-
-
-		
 			return true;
 
 			
@@ -186,6 +187,7 @@ class Sphere: public Shape {
 class Plane:public Shape {
 	public :
 		double distance;
+		std::string name = "Plane";
 
 		Plane(Vector norm, Point org,double distance){
 			normal = norm;

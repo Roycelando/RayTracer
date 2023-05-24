@@ -31,6 +31,7 @@ public:
 		lights.push_back(li);
 
 	}
+
 	std::vector<Shape*> getObjectList() {
 		return objects;
 
@@ -62,14 +63,15 @@ public:
 /*
 This method is used for phong shading, gets ambient, diffuse, and specular lighting intensity
 */
-	inline double getLightIntensity(Shape*& hit, Point hitPoint, Vector normal, Ray& rayI) {
+	inline double getLightIntensity(Shape* &hit, Point hitPoint, Vector normal, Ray& rayI) {
 		double Iamb = 0;
 		double Idiff = 0;
 		double Ispec = 0;
-		bool lightMe = true;
+		bool lightMe = true; // if false, shadow is present
+		double epsilon = 0.0001;
 		rayI.getDirection().normalizeVector();
 
-		// calculated for each light in the scene 
+		//ambient, difuse and specular light calculated for each light in the scene 
 		for (int i = 0; i < lights.size(); i++) {
 			lightMe = true;
 			Vector ray = subPointsV(lights[i].position,hitPoint);
@@ -87,7 +89,7 @@ This method is used for phong shading, gets ambient, diffuse, and specular light
 				double lightD = lightDist.magnitude();
 
 	
-				Ray shadowRay = Ray(ray, addPoints(hitPoint,0.0001));
+				Ray shadowRay = Ray(ray, addPoints(hitPoint,epsilon));
 				shadowRay.getDirection().normalizeVector();
 				Point inter = Point();
 

@@ -1,8 +1,13 @@
 // Shapes: Shphere example: sphere radius x y z glass r g b
-s 2 9 0 -15 g 0 1 1
-s 2 0 0 -10 g 1 0 0
-s 2 -5 -5 -8 r 0 1 0
-s 2 -5 5 -10 r 1 0 1
+// blue blueish ball
+s 2 9 0 -15 r 0 1 1
+// red ball
+s 2 0 1.2 -10 g 1 0 0
+// green ball
+s 4 0 7 -18 r 0.5 0.8 0.34
+// yellow ball
+s 1 2 -1 -5 r 1 1 0
+// pink ball
+s 1 -2 0 2 r 1 0 1
 // Lights: intensity x y z
-l 1 -5 5 1
-//l 1 5 5 1
+l 1 -5 5 30

@@ -66,19 +66,18 @@ class Glass : public Material {
 
 		pixel dColour = pixel(1,0,0);
 
-		Glass(pixel &colour) : Material(colour, 0.4, 0.4, 0.4, 50, 0, 0.2) {
+		Glass(pixel &colour) : Material(colour, 0.4, 0.4, 0.4, 50, 1, 2.5) {
 			// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 
 		}
 
-		Glass() : Material(dColour, 0.4, 0.4, 0.4, 50, 1, 0.3) {
+		Glass() : Material(dColour, 0.4, 0.4, 0.4, 50, 1, 2.5) {
 		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 
 		}
 
-		Glass(double r, double g, double b) : Material(r,g,b, 0.4, 0.4, 0.4, 50, 1, 0.3) {}
+		Glass(double r, double g, double b) : Material(r,g,b, 0.4, 0.4, 0.4, 50, 1, 2.5) {}
 		
-
 };
 
 
@@ -92,8 +91,7 @@ public:
 	}
 
 	Metal() : Material(dColour, 0.4, 0.4, 0.4, 50, 1, 0.3) {
-	//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
-
+		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 	}
 
 	Metal(double r, double g, double b) : Material(r, g, b, 0.4, 0.4, 0.4, 50, 1, 0.3) {}
