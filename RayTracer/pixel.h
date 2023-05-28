@@ -3,32 +3,35 @@
 /*
 		Defines my pixles
 */
-typedef struct pixel {
+typedef struct Pixel {
 	double r,g,b;
 
-	pixel() : r(0), g(0), b(0) {}
+	Pixel() : r(0), g(0), b(0) {}
 
-	pixel(double r, double g, double b) : r(r), g(g), b(b) {}
+	Pixel(double r, double g, double b) : r(r), g(g), b(b) {}
 
 
 };
 
+void printPixel(Pixel p) {
+	std::cout << "(" << p.r << " , " << p.g << " , " << p.b << ")" << std::endl;
 
-pixel addPixels(pixel a, pixel b) {
+}
+Pixel addPixels(Pixel a, Pixel b) {
 
-	return pixel((a.r + b.r),( a.g + b.g), (a.b + b.b));
+	return Pixel((a.r + b.r),( a.g + b.g), (a.b + b.b));
 
 }
 
-pixel multPixels(pixel a, pixel b) {
+Pixel multPixels(Pixel a, Pixel b) {
 
-	return pixel((a.r * b.r),( a.g * b.g), (a.b * b.b));
+	return Pixel((a.r * b.r),( a.g * b.g), (a.b * b.b));
 
 
 }
-pixel multPixels(pixel a, double b) {
+Pixel multPixels(Pixel a, double b) {
 
-	return pixel((a.r * b),( a.g * b), (a.b * b));
+	return Pixel((a.r * b),( a.g * b), (a.b * b));
 
 
 }

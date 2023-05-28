@@ -1,6 +1,5 @@
 #pragma once
 #include<cmath>
-#include"point.h"
 
 /*
 	Defines my vector and a bunch of useful operations
@@ -10,18 +9,9 @@ class Vector {
 	public:
 		double x, y, z;
 
-		Vector() {
-			x = 0;
-			y = 0;
-			z = 0;
-		}
+		Vector() :x(0), y(0),z(0) {}
 		
-		Vector(double x, double y, double z) {
-			this->x = x;
-			this->y = y;
-			this->z = z;
-			
-		}
+		Vector(double x, double y, double z): x(x), y(y), z(z) {}
 
 
 		inline void normalizeVector() {
@@ -72,40 +62,17 @@ Vector addVectors(Vector a, double b) {
 
 }
 
-Vector addVectors(Vector a, Point b) {
-	
-
-	return Vector((a.x+b.x),(a.y+b.y),(a.z+b.z));
-
-}
 Vector subVectors(Vector a, Vector b) {
 
 	return Vector((a.x-b.x),(a.y-b.y),(a.z-b.z));
 
 }
-Vector subVectors(Vector a, Point b) {
 
-	return Vector((a.x-b.x),(a.y-b.y),(a.z-b.z));
 
-}
-
-Vector subPointsV(Point a, Point b) {
-
-	return Vector((a.x-b.x),(a.y-b.y),(a.z-b.z));
-
-}
 
 Vector subVectors(Vector a, double b) {
 	
-
 	return Vector((a.x-b),(a.y-b),(a.z-b));
-
-}
-
-Vector subVectors(double a, Vector b) {
-	
-
-	return Vector((a-b.x),(a-b.y),(a-b.z));
 
 }
 
@@ -137,37 +104,22 @@ double dotVectors(Vector a, Vector b) {
 }
 
 
-Vector converToVectorP(Point o , Vector d) {
-	return Vector(o.x+d.x,o.y+d.y,o.z+d.z);
-
-}
-
-Vector convertToVector(Point a) {
-	return Vector(a.x,a.y,a.z);
-
-}
-
-Point convertToPoint(Vector a) {
-	return Point(a.x,a.y,a.z);
-
-}
-
 /*
 Gets the reflection vector
 */
-Vector getRefelction(Vector i, Vector n) {
-	i.normalizeVector();
+Vector getRefelction(Vector I, Vector n) {
+	I.normalizeVector();
 	n.normalizeVector();
+	//std::cout << " mag: " << n.magnitude() << std::endl;
 
-	double co = -2 * dotVectors(n,i);
+	double beta = 2 * dotVectors(I,n);
 
-	Vector vec = multVectors(n, co);
-	vec.normalizeVector();
+	Vector N = multVectors(n, beta);
 
-	return addVectors(i, vec);
+	Vector R = subVectors(I, N);
+	R.normalizeVector(); 
 
-
-
+	return R;
 }
 
 

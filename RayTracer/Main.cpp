@@ -12,18 +12,18 @@
 #include<limits>
 #include<algorithm>
 //#include <windows.h>
+#define background  Pixel(0.00078,0.1411,1);
+#define background  Pixel(0,0,0);
 //#include <Commdlg.h>
-#define background  pixel(0.00078,0.1411,1);
-#define background  pixel(0,0,0);
 const double AIR	= 1.0003;
 
 
 
 // function defitiion
 void saveImage();
-void colourPixel(pixel* frameBuffer);
-void printPixels(pixel* frameBuffer);
-pixel rayTrace(Ray ray, double depth,double ni);
+void colourPixel(Pixel* frameBuffer);
+void printPixels(Pixel* frameBuffer);
+Pixel rayTrace(Ray ray, double depth,double ni);
 void loadScene();
 
 //global variables
@@ -35,43 +35,8 @@ Scene scene =  Scene();
 //Camera
 Camera cam = Camera(0,0,1);
 
-pixel frameBuffer[(width*height)];
+Pixel frameBuffer[(width*height)];
 
-//settting up scene
-pixel p = pixel(0, 0, 1);
-pixel p2 = pixel(0.658, 0.690, 0.698);
-pixel p3 = pixel(0.7, 0.1, 0.3);
-pixel p4 = pixel(0.2, 0.2, 0.8);
-pixel p5 = pixel(0.8, 0.3, 0.5);
-
-Material m = Glass(p);
-Material m2 = Glass(p2);
-Material m3 = Rubber(p3);
-Material m4 = Glass(p4);
-Material m5 = Glass(p5);
-
-
-
-
-Sphere* sphere = new Sphere(2, Point(-5,0,-10),m);
-Sphere* sphere2 = new Sphere(2, Point(3,0,-5),m3);
-Sphere* sphere3 = new Sphere(2, Point(0,-3,-15),m2);
-Sphere* sphere4 = new Sphere(3, Point(0,5,-20),m4);
-
-//Plane* plane = new Plane();
-
-//Sphere* sphere3 = new Sphere(1, Point(0,1,-8),m2);
-
-Point pos = Point(-7, 5, -10);
-Point pos2 = Point(0, -2, -20);
-Point pos3 = Point(0, 5, -10);
-Point pos4 = Point(0, 5, 3);
-
-
-Light light = Light(pos,4);
-Light light2 = Light(pos2,7);
-Light light3 = Light(pos3,3);
-Light light4 = Light(pos4,4);
 
 
 // viewport
@@ -80,21 +45,6 @@ double H = cam.origin.z * tan(cam.fov / 2.0);
 double W = H * aspectRatio;
 
 int main() {
-	
-	// placing objects in scene
-//	scene.addObjects(sphere);
-//	scene.addObjects(sphere2);
-//	scene.addObjects(sphere3);
-//	scene.addObjects(sphere4);
-
-	//placing lights
-
-//	scene.addLights(light);
-	//	scene.addLights(light2);
-	//	scene.addLights(light3);
-	//	scene.addLights(light4);
-
-
 	// saving image
 	loadScene();
 	colourPixel(frameBuffer);
@@ -106,77 +56,63 @@ int main() {
 /*
 	This method is used to ray trace
 */
-pixel rayTrace(Ray ray, double depth, double ni) {
-	double tfar = std::numeric_limits<double>::max();
+Pixel rayTrace(Ray ray, double depth, double ni) {
 	double tclose = std::numeric_limits<double>::max();
-	Shape* hit;
+	Shape* hitObject = nullptr;
 
-	Point ri;
+	Vector hitPoint;
 	Vector normal;
-	pixel local;
-	pixel ref = pixel(0,0,0);
-	pixel refrac = pixel(0,0,0);
-	hit = new Shape();
-	double epsilon = 0.001;
 
-	if (depth > 4) {
+	Pixel local; // local colour
+	Pixel ref; // reflection colour
+	Pixel refrac; // refraction colour
+	double epsilon = 0.00001; // large numbers cause saturation
 
-		return background;
-
-	}
-
-	else {
-
-		if (scene.intersect(ray,ri,normal,tclose,tfar,hit)) {
-
-			//std::cout << "tclose: " << tclose << std::endl;
+	
+		if (depth<4 && scene.intersect(ray,hitPoint,normal,tclose,hitObject)) {
 			
 
-			Point hitPoint = ri;
+			//std::cout << "mag: " << ray.getDirection().magnitude() << std:: endl;
+			 double I = scene.shade(hitObject,hitPoint,normal,ray);
+			// double I = std::min((std::max(scene.getLightIntensity(hit, hitPoint, normal, ray),(double)0)),(double)1);
 
-			//double I = std::min(scene.getLightIntensity(hit,hitPoint,normal,ray),(double)1.0);
-			double I = std::min((std::max(scene.getLightIntensity(hit, hitPoint, normal, ray),(double)0)),(double)1);
-			double r = (hit->mat->colour.r)*I;
-			double g = (hit->mat->colour.g)*I;
-			double b = (hit->mat->colour.b)*I;
-
-			local = pixel(r,g,b);
+			double r = (hitObject->mat->colour.r)*I;
+			double g = (hitObject->mat->colour.g)*I;
+			double b = (hitObject->mat->colour.b)*I;
 
 
+			local = Pixel(r,g,b);
 
-			if (hit->mat->reflec>0) {
+			//printPixel(local);
+
 
 			//reflection
 
-				ray.getDirection().normalizeVector();
+			if (hitObject->mat->reflec>0) {
 				Vector dirRef = getRefelction(ray.getDirection(),normal);
-				dirRef.normalizeVector();
-
-				Point hitPointEpsilon = addPoints(hitPoint,epsilon);
-
+				Vector hitPointEpsilon = addVectors(hitPoint,epsilon); //pushes the ray a bit so it doesn't intersect with its starting object
 				Ray  reflect = Ray(dirRef,hitPointEpsilon);
-				reflect.getDirection().normalizeVector();
 				
 					
-				ref = rayTrace(reflect,++depth,hit->mat->refrac);
+				ref = rayTrace(reflect,++depth,hitObject->mat->refrac);
 
+				ref = multPixels(ref, hitObject->mat->reflec);
 
-				ref.r = std::min(std::max((double)ref.r, (double)0),(double)1);
-				ref.g = std::min(std::max((double)ref.g, (double)0),(double)1);
-				ref.b = std::min(std::max((double)ref.b, (double)0),(double)1);
-				ref = multPixels(ref, hit->mat->reflec);
+				ref.r = std::min(std::max(ref.r, 0.0),1.0);
+				ref.g = std::min(std::max(ref.g, 0.0),1.0);
+				ref.b = std::min(std::max(ref.b, 0.0),1.0);
 
-
+				
 			}
 
-		//refraction equation: T = alpha*I + beta *N, T is the transmission vector
+			//refraction equation: T = alpha*I + beta *N, T is the transmission vector
 
 			double nt = AIR;
 
 			if(ni == AIR)
-				nt = hit->mat->refrac; // material transmission
+				nt = hitObject->mat->refrac; // material transmission
 
-			if (nt>0 || false) {
+			if ( false) {
 				double nit = ni / nt; // snells law
 				ray.getDirection().normalizeVector(); // normalizing the ray just incase its not normalized yet
 				Vector nitI = multVectors(ray.getDirection(),nit); // the ray is the incident ray, so we multiply it by nit
@@ -198,9 +134,9 @@ pixel rayTrace(Ray ray, double depth, double ni) {
 					T.normalizeVector(); // want the unit vector of the transmison vector 
 					N.normalizeVector(); // wnat the unit vector of the normal vector 
 
-					Ray refract = Ray(T,addPoints(hitPoint, 0.011));
+					Ray refract = Ray(T,addVectors(hitPoint, 0.011));
 
-					if (hit->name =="Sphere" && ni == AIR ) { 
+					if (ni == AIR ) { 
 						refrac = rayTrace(refract,++depth,nt);
 
 					}
@@ -219,7 +155,8 @@ pixel rayTrace(Ray ray, double depth, double ni) {
 			
 			}
 
-			pixel result = 	addPixels(addPixels(local, ref),refrac);
+
+			Pixel result = 	addPixels(local, ref);
 			result.r = std::min(std::max(result.r, (double)0), (double)1);
 			result.g = std::min(std::max(result.g, (double)0), (double)1);
 			result.b = std::min(std::max(result.b, (double)0), (double)1);
@@ -227,13 +164,7 @@ pixel rayTrace(Ray ray, double depth, double ni) {
 			return result;
 		}
 
-		else {
-		
 			return background;
-		}
-
-
-	}
 
 }
 
@@ -282,8 +213,8 @@ void loadScene() {
 					infile >> g;
 					infile >> b;
 					
-					Point point = Point(x,y,z); // creates the Point object
-					pixel pix = pixel(r, g, b);
+					Vector point = Vector(x,y,z); // creates the Point object
+					Pixel pix = Pixel(r, g, b);
 					if (m == 'r') {
 
 						mat = new Rubber(pix);
@@ -340,14 +271,14 @@ void loadScene() {
 /*
 * This method fills the frame buffer with results form the ray tracer
 */
-void colourPixel(pixel* frameBuffer) {
-	
+void colourPixel(Pixel* frameBuffer) {
+//#pragma omp paralle for
 	for (int i = 0; i < height; i++ ) {
 		for (int j = 0; j < width; j++) {
 			double depth = 0;
 
-			double valc = 2 * j / ((double)width);
-			double valr = 2 * i / ((double)height);
+			double valc = 2 * (j+0.5) / ((double)width);
+			double valr = 2 * (i+0.5) / ((double)height);
 
 			Ray ray = cam.castRay(W,H,valc,valr); // casting a ray toward current pixel
 	
@@ -367,7 +298,7 @@ void saveImage() {
 	file << "P3\n" << width << ' ' << height << "\n255\n";
 	for (int i = 0; i <width*height; i++) {
 		
-		pixel p = frameBuffer[i];
+		Pixel p = frameBuffer[i];
 
 		unsigned int r = (int)(p.r * 255.999);
 		unsigned int g = (int)(p.g * 255.999);
@@ -385,10 +316,10 @@ void saveImage() {
 	This method prints to the consol pixels in my farmnebuffer.
 	Used for debugging
 */
-void printPixels(pixel* frameBuffer) {
+void printPixels(Pixel* frameBuffer) {
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
-			pixel p = frameBuffer[(i * height) + j];
+			Pixel p = frameBuffer[(i * height) + j];
 			std::cout << "r: " << p.r<< " g: " <<p.g << " b: " <<p.b << std::endl;
 		}
 		std::cout << std::endl;

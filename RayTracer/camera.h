@@ -2,9 +2,7 @@
 
 #include"vector.h"
 #include"ray.h"
-#include"point.h"
 #include<math.h>
-#define PI 3.14159265358979323846
 
 /*
 defines my camera
@@ -15,20 +13,19 @@ public:
 	Vector right;
 	Vector up;
 	Vector forward;
-	Point origin;
+	Vector origin;
 	double focalDistance = 1;
 
-	double fov = PI/2;
+	double fov = 1.05;
 
-	Camera() : right(1, 0, 0), up(0, 1, 0), forward(0, 0, 1),origin(0, 0, 1) {}
+	Camera() : right(1, 0, 0), up(0, 1, 0), forward(0, 0, -1),origin(0, 0, 1) {}
 
-	Camera(double x, double y, double z): right(1,0,0), up(0,1,0), forward(0,0,1), origin(x,y,z) {
+	Camera(double x, double y, double z): right(1,0,0), up(0,1,0), forward(0,0,-1), origin(x,y,z) {
 				//	std::cout << " x: " << up.x << " y: " << up.y << " z: " << up.z <<  std::endl;
 
 	}
 
-	Camera(Point origin) : right(1, 0, 0), up(0, 1, 0), forward(0, 0, 1), origin(origin.x,origin.y,origin.z) {
-				focalDistance = abs(origin.z);
+	Camera(Vector origin) : right(1, 0, 0), up(0, 1, 0), forward(0, 0, -1), origin(origin.x,origin.y,origin.z), focalDistance(abs(origin.z)) {
 				//std::cout << " x: " << up.x << " y: " << up.y << " z: " << up.z <<  std::endl;
 	}
 
@@ -51,10 +48,10 @@ public:
 		double vr = -H * (valr - 1);
 		Vector v = multVectors(up, vr);
 
-		Vector n = multVectors(forward, -focalDistance);
+		Vector n = multVectors(forward, focalDistance);
 
 		rayDir = addVectors(addVectors(n, u), v);
-
+		rayDir.normalizeVector();
 
 
 		return Ray(rayDir,origin);
@@ -62,10 +59,6 @@ public:
 
 	}
 
-	Vector getForward() {
-		return  forward;
-
-	}
 
 
 

@@ -1,0 +1,12 @@
+// Shapes: Shphere example: sphere radius x y z glass r g b
+// left ball
+s 1 -2 0 -5 g 1 0 0
+// right ball
+s 1 2 0 -5 g 1 0 1
+// top ball
+s 1 0 1 -8 g 1 1 1
+// bottom ball
+s 1 0 -2 -6 g 1 1 0
+// Lights: intensity x y z
+l 1 -5 5 5
+l 1 0 0 -6

@@ -1,7 +1,6 @@
 #pragma once
 #include"shape.h"
 #include"vector.h"
-#include"point.h"
 #include<vector>
 #include"lights.h"
 #include <cmath>
@@ -42,20 +41,15 @@ public:
 
 	}
 
-	inline bool intersect(Ray& ray, Point& rayInt, Vector& rayNorm, double& tclose, double& tfar, Shape*& hitObject) {
+	inline bool intersect(Ray& ray, Vector& rayInt, Vector& normal, double& tclose, Shape* &hitObject) {
 		bool hitSomething = false;
 		for (int i = 0; i < objects.size(); i++) {
-			if (objects[i]->intersect(ray, rayInt, rayNorm, tclose, tfar, hitObject, objects[i])) {
+			if (objects[i]->intersect(ray, rayInt, normal, tclose, hitObject, objects[i])) 
 				hitSomething = true;
-			}
-
 
 		}
 
-		if (hitSomething)
-			return true;
-
-		return false;
+		return hitSomething;
 
 	}
 	
@@ -63,7 +57,7 @@ public:
 /*
 This method is used for phong shading, gets ambient, diffuse, and specular lighting intensity
 */
-	inline double getLightIntensity(Shape* &hit, Point hitPoint, Vector normal, Ray& rayI) {
+	inline double shade(Shape* &hitObj, Vector hitPoint, Vector& normal, Ray& rayI) {
 		double Iamb = 0;
 		double Idiff = 0;
 		double Ispec = 0;
@@ -74,30 +68,27 @@ This method is used for phong shading, gets ambient, diffuse, and specular light
 		//ambient, difuse and specular light calculated for each light in the scene 
 		for (int i = 0; i < lights.size(); i++) {
 			lightMe = true;
-			Vector ray = subPointsV(lights[i].position,hitPoint);
-			ray.normalizeVector();
+			Vector lightRay = subVectors(lights[i].position,hitPoint); // ray from hit point to light
+			lightRay.normalizeVector();
 
 
 			//abmient light
 
-			Iamb += (ambI * hit->mat->ambR);
+			Iamb += (ambI * hitObj->mat->ambR);
 
-			// shadow
+			// shadow 
 
 			for (int j = 0; j < objects.size(); j++) {
-				Vector lightDist = subPointsV(lights[i].position,hitPoint);
-				double lightD = lightDist.magnitude();
-
-	
-				Ray shadowRay = Ray(ray, addPoints(hitPoint,epsilon));
+				double lightDistance = lightRay.magnitude();
+				Ray shadowRay = Ray(lightRay, addVectors(hitPoint,epsilon));
 				shadowRay.getDirection().normalizeVector();
-				Point inter = Point();
+				Vector inter = Vector();
 
 				if (objects[j]->intersect(shadowRay, inter)) {
-
-					Vector vecDist = subPointsV(lights[i].position,inter);
+					Vector vecDist = subVectors(lights[i].position,inter);
 					double dist = vecDist.magnitude();
-					if (dist < lightD) {
+
+					if (dist < lightDistance) {
 						lightMe = false;
 						break;
 					}
@@ -110,29 +101,19 @@ This method is used for phong shading, gets ambient, diffuse, and specular light
 
 
 				//diffuse light
-				normal.normalizeVector();
-				double specAngle = (double)dotVectors(ray, normal);
+				double diffuseAngle = std::max(dotVectors(lightRay, normal),0.0);
 
-				Idiff += (lights[i].intensity * std::max((double)specAngle, (double)0.0)) * hit->mat->diffR;
+				Idiff += (lights[i].intensity * diffuseAngle* hitObj->mat->diffR);
 
 				//specular  light
 
-				Vector negRay = multVectors(ray, -1);
-				
-				Vector reflection = getRefelction(negRay,normal);
-				reflection.normalizeVector();
+				Vector negLightRay = multVectors(lightRay, -1);
+				Vector reflection = getRefelction(negLightRay,normal);
+				Vector incedentRay = multVectors(rayI.getDirection(),-1);
+				incedentRay.normalizeVector();
+				double cosBeta = std::max(dotVectors(reflection, incedentRay), 0.0);
 
-				Vector negIncident = multVectors(rayI.getDirection(),-1);
-				negIncident.normalizeVector();
-
-				double cosBeta = std::max(dotVectors(reflection,negIncident),0.0);
-
-
-				Ispec += lights[i].intensity * (hit->mat->specR) * pow(cosBeta, hit->mat->specH);
-
-
-
-
+				Ispec += (lights[i].intensity * (hitObj->mat->specR) * pow(cosBeta, hitObj->mat->specH));
 
 			}
 

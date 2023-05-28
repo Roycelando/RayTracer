@@ -1,5 +1,4 @@
 #pragma once
-#include"point.h"
 #include"ray.h"
 #include"Vector.h"
 #include<cmath>
@@ -9,38 +8,27 @@
 */
 class Shape {
 	public:
-		Point origin;
-		Vector normal;
+		Vector origin;
 		Material* mat;
-		std::string name;
 		
-		Shape() {
-			origin = Point();
-			normal = Vector();
-			mat = new Rubber();
+		Shape(): origin(0,0,0), mat(new Rubber) {
 		}
 
-		Shape(Point origin) {
-			this->origin = origin;
-			mat = new Rubber();
+		Shape(Vector origin): origin(origin), mat(new Rubber) {
+
 		}
 
-		Shape(Point origin, Material mat) {
-			this->origin = origin;
-			this->mat = &mat;
-		}
+		Shape(Vector origin, Material& mat): origin(origin), mat(&mat) {
+			printPixel(mat.colour);
 
-		Shape(double x, double y, double z): origin(x,y,z) {
-			
 		}
 
 
-		virtual inline bool intersect(Ray& ray , Point& ri, Vector& normal, double& tclose, double& tfar, Shape* & hit, Shape* & curObj) {
-			//std::cout << "is my hunc corrcect?" << std::endl;
+		virtual inline bool intersect(Ray& ray , Vector& ri, Vector& normal, double& tclose, Shape* & closestObj, Shape* & curObj) {
 			return false;
 		}
 
-		virtual	inline bool intersect(Ray& ray, Point& intersect) {
+		virtual	inline bool intersect(Ray& ray, Vector& intersect) {
 			return false;
 		}
 
@@ -53,51 +41,34 @@ class Sphere: public Shape {
 	public :
 			double radius;
 
-		Sphere() {
-			radius = 1.0;
-			origin = Point(0,0,-2);
-			mat = new Rubber();
-			name = "Sphere";
-
-		}
+		Sphere():radius(1), Shape() {}
 			
-		Sphere (double radius, Point origin){
-				this->radius = radius;
-				this->origin = origin;
-				mat = new Glass();
-				name = "Sphere";
+		Sphere (double radius, Vector origin): radius(radius),Shape(origin){}
 
-		}
-
-		Sphere (double radius, Point origin, Material& m){
-			this->radius = radius;
-			this->origin = origin;
-			mat = &m;
-			name = "Sphere";
-
-		}
+		Sphere (double radius, Vector origin, Material& m): radius(radius), Shape(origin, m){}
 
 
-		inline bool intersect(Ray& ray, Point& ri, Vector& normal,double& tclose, double& tfar,Shape* & hit, Shape* & curObj) override {
+		inline bool intersect(Ray& ray, Vector& hitPoint, Vector& normal,double& tclose,Shape* & closestObj, Shape* & curObj) override {
 			// A^2t + Bt +C = 0 
+			double tfar = std::numeric_limits<double>::max();
 			Vector rayDir = ray.getDirection();
-			Point rayOrigin = ray.getOrigin();
+			Vector rayOrigin = ray.getOrigin();
 			rayDir.normalizeVector();
-			double epsilon = 0.0011;
+			double epsilon = 0.001;
 
 
-			double A = pow(rayDir.x, 2) + pow(rayDir.y, 2) + pow(rayDir.z,2);
 			double B = 2 * ( (rayDir.x*(rayOrigin.x-origin.x)) + (rayDir.y*(rayOrigin.y-origin.y)) + (rayDir.z*(rayOrigin.z-origin.z)) );
 			double C = pow((rayOrigin.x - origin.x), 2) + pow((rayOrigin.y - origin.y), 2) + pow((rayOrigin.z - origin.z), 2) - pow(radius, 2);
 
 
-			double Disc = pow(B, 2) - (4 * C);
+			double Disc = pow(B, 2) - (4* C);
 
 
 			if (Disc < 0)
 				return false;
-			double t0 = (- B - sqrt((B * B) - (4 * C))) / 2.0;
-			double t1 = (- B + sqrt((B * B) - (4 * C))) / 2.0;
+
+			double t0 = (- B - sqrt((B * B) - (4*C))) / 2.0;
+			double t1 = (- B + sqrt((B * B) - (4*C))) / 2.0;
 
 
 
@@ -115,42 +86,34 @@ class Sphere: public Shape {
 				 return false;
 
 			 tclose = t;
-			 hit = curObj;
+			 closestObj = curObj;
 
-				double xi = rayOrigin.x + (rayDir.x * t);
-				double yi = rayOrigin.y + (rayDir.y * t);
-				double zi = rayOrigin.z + (rayDir.z * t);
+					
+				hitPoint = ray.getDistanceT(tclose); // intersect point of the ray on the sphere
 
-				
-				ri = Point(xi,yi,zi); // intersect point of the ray on the sphere
-
-				double xn = (xi - origin.x) / radius;
-				double yn = (yi - origin.y) / radius;
-				double zn = (zi - origin.z) / radius;
+				double xn = (hitPoint.x - origin.x)/radius;
+				double yn = (hitPoint.y - origin.y)/radius;
+				double zn = (hitPoint.z - origin.z)/radius;
 
 				normal = Vector(xn,yn,zn);
-
-				normal.normalizeVector();
-
 
 
 			return true;
 
 		}
-	inline bool intersect(Ray& ray, Point& intersect) override {
+	inline bool intersect(Ray& ray, Vector& intersect) override {
 			// A^2t + Bt +C = 0 
 			double epsilon = 0.001;
 			Vector rayDir = ray.getDirection();
-			Point rayOrigin = ray.getOrigin();
+			Vector rayOrigin = ray.getOrigin();
 			rayDir.normalizeVector();
 
 
-			double A = pow(rayDir.x, 2) + pow(rayDir.y, 2) + pow(rayDir.z,2);
 			double B = 2 * ( (rayDir.x*(rayOrigin.x-origin.x)) + (rayDir.y*(rayOrigin.y-origin.y)) + (rayDir.z*(rayOrigin.z-origin.z)) );
 			double C = pow((rayOrigin.x - origin.x), 2) + pow((rayOrigin.y - origin.y), 2) + pow((rayOrigin.z - origin.z), 2) - pow(radius, 2);
 
 
-			double Disc = pow(B, 2) - (4 * C);
+			double Disc = pow(B, 2) - (4*C);
 
 
 			if (Disc < 0)
@@ -167,11 +130,7 @@ class Sphere: public Shape {
 			else
 				return false;
 
-			double xi = rayOrigin.x + (rayDir.x * t);
-			double yi = rayOrigin.y + (rayDir.y * t);
-			double zi = rayOrigin.z + (rayDir.z * t);
-
-			intersect = Point(xi, yi, zi); // intersect point of the ray on the sphere
+			intersect = ray.getDistanceT(t); // intersect point of the ray on the sphere
 
 			return true;
 
@@ -186,10 +145,11 @@ class Sphere: public Shape {
 */
 class Plane:public Shape {
 	public :
+		Vector normal;
 		double distance;
 		std::string name = "Plane";
 
-		Plane(Vector norm, Point org,double distance){
+		Plane(Vector norm, Vector org,double distance){
 			normal = norm;
 			origin = org;
 			this->distance = distance;
@@ -197,13 +157,13 @@ class Plane:public Shape {
 
 		Plane() {
 			normal = Vector(0,1,0);
-			Point(0,0,0);
+			Vector(0,0,0);
 			distance = 10;
 			mat = new Rubber();
 
 		}
 
-		inline bool intersect(Ray& ray, Point& ri, Vector& normal, double& tclose, double& tfar, Shape*& hit, Shape*& curObj) {
+		inline bool intersect(Ray& ray, Vector& ri, Vector& normal, double& tclose, double& tfar, Shape*& hit, Shape*& curObj) {
 			ray.getDirection().normalizeVector();
 			
 
@@ -216,7 +176,7 @@ class Plane:public Shape {
 			 }
 
 
-			 Vector Ro = convertToVector(ray.getOrigin());
+			 Vector Ro = ray.getOrigin();
 			 Ro.normalizeVector();
 			 double t = -1*(dotVectors(this->normal, Ro) + this->distance)/ PnRd;
 
@@ -226,9 +186,9 @@ class Plane:public Shape {
 
 			 ray.getDirection().normalizeVector();
 			 Vector r = ray.getDirection();
-			 Point o = ray.getOrigin();
+			 Vector o = ray.getOrigin();
 				
-			 ri = Point((o.x + (r.x*t)),(o.y+(r.y*t)),(o.z+(r.z*t)));
+			 ri = Vector((o.x + (r.x*t)),(o.y+(r.y*t)),(o.z+(r.z*t)));
 			 //normal = subPointsV( addPoints(ri,(0,5,0)),ri);
 			 normal = this->normal;
 			 normal.normalizeVector();
@@ -238,7 +198,7 @@ class Plane:public Shape {
 				return true;
 		}
 
-		virtual	inline bool intersect(Ray& ray, Point interesect,double tfar) {
+		virtual	inline bool intersect(Ray& ray, Vector interesect,double tfar) {
 
 			return false;
 		}

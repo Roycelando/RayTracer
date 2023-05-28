@@ -26,9 +26,6 @@
     <ClInclude Include="pixel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="point.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
