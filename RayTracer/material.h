@@ -47,16 +47,16 @@ class Rubber : public Material {
 
 		Pixel dColour = Pixel(1,0,0);
 
-		Rubber(Pixel &colour) : Material(colour, 0.5, 0.6, 0.6, 20, 0, 0) {
+		Rubber(Pixel &colour) : Material(colour, 0.6, 0.4, 0.3, 20, 0, 0) {
 		// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 		}
 
-		Rubber(double r, double g, double b) : Material(r,g,b,0.5, 0.6, 0.6, 20, 0, 0) {
+		Rubber(double r, double g, double b) : Material(r,g,b,0.6, 0.6, 0.6, 20, 0, 0) {
 			//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 
 		}
 
-		Rubber() : Material(dColour, 0.5, 0.6, 0.6, 20, 0, 0) {}
+		Rubber() : Material(dColour, 0.6, 0.6, 0.6, 20, 0, 0) {}
 
 };
 
@@ -66,17 +66,17 @@ class Glass : public Material {
 
 		Pixel dColour = Pixel(1,0,0);
 
-		Glass(Pixel &colour) : Material(colour, 0.2, 0, 0.8, 1000, 1, 0.8) {
+		Glass(Pixel &colour) : Material(colour, 0.5, 0.5, 0.5, 1000, 1, 1.5) {
 			// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 
 		}
 
-		Glass() : Material(dColour, 0.2, 0.8, 0.8, 100, 1, 0.8) {
+		Glass() : Material(dColour, 0.5, 0, 0.8, 100, 1, 1.5) {
 		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 
 		}
 
-		Glass(double r, double g, double b) : Material(r,g,b, 0.2, 0.8, 1.0, 1000, 1, 0.8) {}
+		Glass(double r, double g, double b) : Material(r,g,b, 0.5, 0, 1.0, 1000, 1, 1.5) {}
 		
 };
 

@@ -19,8 +19,7 @@ class Shape {
 		}
 
 		Shape(Vector origin, Material& mat): origin(origin), mat(&mat) {
-			printPixel(mat.colour);
-
+		
 		}
 
 
@@ -48,7 +47,7 @@ class Sphere: public Shape {
 		Sphere (double radius, Vector origin, Material& m): radius(radius), Shape(origin, m){}
 
 
-		inline bool intersect(Ray& ray, Vector& hitPoint, Vector& normal,double& tclose,Shape* & closestObj, Shape* & curObj) override {
+	inline bool intersect(Ray& ray, Vector& hitPoint, Vector& normal,double& tclose,Shape* & closestObj, Shape* & curObj) override {
 			// A^2t + Bt +C = 0 
 			double tfar = std::numeric_limits<double>::max();
 			Vector rayDir = ray.getDirection();
@@ -100,9 +99,8 @@ class Sphere: public Shape {
 
 			return true;
 
-		}
+	}
 	inline bool intersect(Ray& ray, Vector& intersect) override {
-			// A^2t + Bt +C = 0 
 			double epsilon = 0.001;
 			Vector rayDir = ray.getDirection();
 			Vector rayOrigin = ray.getOrigin();
@@ -130,16 +128,14 @@ class Sphere: public Shape {
 			else
 				return false;
 
-			intersect = ray.getDistanceT(t); // intersect point of the ray on the sphere
-
+			intersect = ray.getDistanceT(t); 
 			return true;
-
-			
 		}
 
 	private:
 
 };
+
 /*
 	Don't try to render planes, I didn't get it to work on time
 */

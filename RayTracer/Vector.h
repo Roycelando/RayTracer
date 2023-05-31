@@ -1,5 +1,7 @@
 #pragma once
 #include<cmath>
+#include<optional>
+#include<cmath>
 
 /*
 	Defines my vector and a bunch of useful operations
@@ -31,7 +33,6 @@ class Vector {
 
 			return sqrt((a+b+c));
 				
-
 		}
 
 		inline void printVector() {
@@ -67,7 +68,6 @@ Vector subVectors(Vector a, Vector b) {
 	return Vector((a.x-b.x),(a.y-b.y),(a.z-b.z));
 
 }
-
 
 
 Vector subVectors(Vector a, double b) {
@@ -120,6 +120,51 @@ Vector getRefelction(Vector I, Vector n) {
 	R.normalizeVector(); 
 
 	return R;
+}
+
+
+Vector getRefraction(const Vector I, const Vector N, const double etai , const double etat ) {
+	Vector T;
+	Vector Ncopy = multVectors(N,-1);
+	Vector Icopy = I;
+
+	Ncopy.normalizeVector();
+	Icopy.normalizeVector(); 
+
+
+	double ci = std::max(std::min(dotVectors(Ncopy,Icopy),1.0),-1.0);
+	double eta = etai / etat; // snells law
+
+	if (ci < 0) {
+		ci = -ci;
+		eta = 1/eta;
+		//std::cout<<"hi" << std::endl;
+
+	}
+	
+
+	double etaPow = eta * eta;
+	double ciPow = ci*ci;
+	double k = 1 - etaPow* (1-ciPow);
+
+	if (k>0) {
+		double beta = (eta * ci) - (sqrtl(k));
+	//	std::cout << "beta: "<< beta<< "eta: "<< eta << std::endl;
+
+		Vector etaI = multVectors(I,eta);
+		Vector betaN = multVectors(N,beta); // Normal vector
+		T = addVectors(etaI,betaN); // Transmissin vector
+		T.normalizeVector();
+		//std::cout << "Magnitude: " << T.magnitude() << std::endl;
+
+		//T.printVector();
+
+
+		return T;
+	}
+
+	return T;
+
 }
 
 
