@@ -47,7 +47,7 @@ class Rubber : public Material {
 
 		Pixel dColour = Pixel(1,0,0);
 
-		Rubber(Pixel &colour) : Material(colour, 0.6, 0.4, 0.3, 20, 0, 0) {
+		Rubber(Pixel &colour) : Material(colour, 0.6, 0.3, 0.5, 50, 0, 0) {
 		// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 		}
 
@@ -66,7 +66,7 @@ class Glass : public Material {
 
 		Pixel dColour = Pixel(1,0,0);
 
-		Glass(Pixel &colour) : Material(colour, 0.5, 0.5, 0.5, 1000, 1, 1.5) {
+		Glass(Pixel &colour) : Material(colour, 0.0, 0.1, 1, 1000, 1, 1.5) {
 			// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
 
 		}

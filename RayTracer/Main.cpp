@@ -13,6 +13,7 @@
 #include<algorithm>
 //#include <windows.h>
 #define background  Pixel(0,0,0);
+#define background  Pixel(0.2,0.7,0.8);
 #define background  Pixel(0.00078,0.1411,1);
 //#include <Commdlg.h>
 const double AIR	= 1.0003;
@@ -44,7 +45,7 @@ double W = H * aspectRatio;
 
 int main() {
 	Vector l = Vector(0.707107,-0.707107,0);
-	Vector n = Vector(0,1,0);
+	Vector n = Vector(0,1,);
 	double n1 = 0.9;
 	double n2 = 1.0;
 
@@ -76,10 +77,10 @@ Pixel rayTrace(Ray ray, double depth, const double etai) {
 	double epsilon = 0.000001; // large numbers cause saturation
 
 	
-	if (depth >= 7 || !(scene.intersect(ray, hitPoint, normal, tclose, hitObject))) 
+	if (depth > 4 || !(scene.intersect(ray, hitPoint, normal, tclose, hitObject))) 
 		return background;
 	
-			double shade = scene.shade(hitObject,hitPoint,normal,ray);
+			double shade = std::max(std::min(scene.shade(hitObject,hitPoint,normal,ray),1.0),0.0);
 			local = clamp(multPixels(hitObject->mat->colour,shade));
 
 			//reflection
@@ -88,29 +89,33 @@ Pixel rayTrace(Ray ray, double depth, const double etai) {
 				Vector dirRef = getRefelction(ray.getDirection(),normal);
 				Ray  reflect = Ray(dirRef,addVectors(hitPoint,epsilon));
 				
-				reflc = rayTrace(reflect,++depth,AIR);
+				reflc = rayTrace(reflect,++depth,etai);
 				reflc = clamp(multPixels(reflc, reflecRatio));
 			
 			}
 
-		
 		    //refration 
 			double etat = hitObject->mat->refrac;
 			if (etat > 0) {
-					Vector T = getRefraction(ray.getDirection(),normal,etai,etat);
-					//std::cout<<"Magnitude: "<<T.magnitude()<<std::endl;
+					Vector T = getRefraction(ray.getDirection(),normal,etai, etat);
 
 					if (T.magnitude() == 0.0) return clamp(addPixels(local, reflc));
 
 					Ray refract = Ray(T,addVectors(hitPoint,epsilon));
-					refrac = rayTrace(refract, ++depth, etat);
-					refrac = clamp(multPixels(refrac, 0.3));
+					refrac = rayTrace(refract, ++depth, etai);
+					refrac = clamp(multPixels(refrac, 0.2));
 			}
+
+			//if (depth>2) 
+			//		return	clamp(addPixels(local, refrac));
+
+	
+			
 
 			return	clamp(addPixels(addPixels(local, reflc),refrac));
 }
 
-Material* getMaterial(char mat, Pixel colour) {
+Material* parseMaterial(char mat, Pixel colour) {
 	switch (mat) {
 		case'R':
 		case 'r': {
@@ -169,7 +174,7 @@ void loadScene() {
 				
 				Vector point = Vector(x,y,z); // creates the Point object
 				Pixel pix = Pixel(r, g, b);
-				mat = getMaterial(m,pix);
+				mat = parseMaterial(m,pix);
 							
 				std::cout << shape << " "<< radius<< " " << x<< " " << y << " "<< " "<< z <<" "<< m << " " << r << " "<< g <<" "<< b << std::endl;
 
@@ -202,7 +207,7 @@ void loadScene() {
 * This method fills the frame buffer with results form the ray tracer
 */
 void colourPixel(Pixel* frameBuffer) {
-//#pragma omp paralle for
+#pragma omp paralle for
 	for (int i = 0; i < height; i++ ) {
 		for (int j = 0; j < width; j++) {
 			double depth = 0;

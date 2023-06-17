@@ -123,42 +123,31 @@ Vector getRefelction(Vector I, Vector n) {
 }
 
 
-Vector getRefraction(const Vector I, const Vector N, const double etai , const double etat ) {
+Vector getRefraction(const Vector I, const Vector N, const double etai, const double etat) {
 	Vector T;
-	Vector Ncopy = multVectors(N,-1);
+	Vector Ncopy = N;
 	Vector Icopy = I;
 
-	Ncopy.normalizeVector();
-	Icopy.normalizeVector(); 
-
-
-	double ci = std::max(std::min(dotVectors(Ncopy,Icopy),1.0),-1.0);
+	double ci = -dotVectors(Ncopy, Icopy);
 	double eta = etai / etat; // snells law
 
-	if (ci < 0) {
-		ci = -ci;
+	if (ci < 0) 
 		eta = 1/eta;
-		//std::cout<<"hi" << std::endl;
 
-	}
+	
 	
 
 	double etaPow = eta * eta;
 	double ciPow = ci*ci;
-	double k = 1 - etaPow* (1-ciPow);
+	double k = 1 + etaPow* (ciPow-1);
 
 	if (k>0) {
-		double beta = (eta * ci) - (sqrtl(k));
-	//	std::cout << "beta: "<< beta<< "eta: "<< eta << std::endl;
 
+		double beta = (eta * ci) - (sqrt(k));
 		Vector etaI = multVectors(I,eta);
 		Vector betaN = multVectors(N,beta); // Normal vector
 		T = addVectors(etaI,betaN); // Transmissin vector
 		T.normalizeVector();
-		//std::cout << "Magnitude: " << T.magnitude() << std::endl;
-
-		//T.printVector();
-
 
 		return T;
 	}
