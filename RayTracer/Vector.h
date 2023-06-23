@@ -49,7 +49,8 @@ class Vector {
  void printVector(Vector v) {
 			std::cout << "(" << v.x << " , " << v.y << " , " << v.z << ")" << std::endl;
 
-		}
+}
+
 Vector addVectors(Vector a, Vector b) {
 
 	return Vector((a.x+b.x),(a.y+b.y),(a.z+b.z));
@@ -123,36 +124,34 @@ Vector getRefelction(Vector I, Vector n) {
 }
 
 
-Vector getRefraction(const Vector I, const Vector N, const double etai, const double etat) {
-	Vector T;
-	Vector Ncopy = N;
-	Vector Icopy = I;
+Vector getRefraction( const Vector I,  const Vector N, const double etai, const double etat) {
+	
+	Vector T = Vector();
+	Vector NegNormal = multVectors(N,-1);
 
-	double ci = -dotVectors(Ncopy, Icopy);
+
+	double ci = dotVectors(I, NegNormal);
 	double eta = etai / etat; // snells law
 
-	if (ci < 0) 
+	if (ci < 0) {
 		eta = 1/eta;
+		ci = -ci;
+	}
 
-	
-	
 
 	double etaPow = eta * eta;
 	double ciPow = ci*ci;
-	double k = 1 + etaPow* (ciPow-1);
+	double k = 1 + etaPow * (ciPow-1);
 
 	if (k>0) {
-
 		double beta = (eta * ci) - (sqrt(k));
 		Vector etaI = multVectors(I,eta);
 		Vector betaN = multVectors(N,beta); // Normal vector
 		T = addVectors(etaI,betaN); // Transmissin vector
 		T.normalizeVector();
-
-		return T;
 	}
 
-	return T;
+		return T;
 
 }
 

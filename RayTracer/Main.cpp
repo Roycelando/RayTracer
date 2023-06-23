@@ -11,12 +11,11 @@
 #include"lights.h"
 #include<limits>
 #include<algorithm>
-//#include <windows.h>
-#define background  Pixel(0,0,0);
+
 #define background  Pixel(0.2,0.7,0.8);
+#define background  Pixel(0,0,0);
 #define background  Pixel(0.00078,0.1411,1);
-//#include <Commdlg.h>
-const double AIR	= 1.0003;
+const double AIR	= 1.0;
 
 
 
@@ -45,13 +44,15 @@ double W = H * aspectRatio;
 
 int main() {
 	Vector l = Vector(0.707107,-0.707107,0);
-	Vector n = Vector(0,1,);
+	Vector n = Vector(0,1,0);
 	double n1 = 0.9;
 	double n2 = 1.0;
 
 	Vector refract = getRefraction(l,n,n1,n2);
 	Vector rfelct = getRefelction(l,n);
+	std::cout << "refraction vector: ";
 	refract.printVector();
+	std::cout << "reflection vecotor: ";
 	rfelct.printVector();
 
 
@@ -96,21 +97,17 @@ Pixel rayTrace(Ray ray, double depth, const double etai) {
 
 		    //refration 
 			double etat = hitObject->mat->refrac;
-			if (etat > 0) {
-					Vector T = getRefraction(ray.getDirection(),normal,etai, etat);
 
+			if (hitObject->mat->refracR > 0) {
+
+					Vector T = getRefraction(ray.getDirection(),normal,etai, etat);
+			
 					if (T.magnitude() == 0.0) return clamp(addPixels(local, reflc));
 
 					Ray refract = Ray(T,addVectors(hitPoint,epsilon));
 					refrac = rayTrace(refract, ++depth, etai);
-					refrac = clamp(multPixels(refrac, 0.2));
+					refrac = clamp(multPixels(refrac, hitObject->mat->refracR));
 			}
-
-			//if (depth>2) 
-			//		return	clamp(addPixels(local, refrac));
-
-	
-			
 
 			return	clamp(addPixels(addPixels(local, reflc),refrac));
 }
@@ -129,7 +126,12 @@ Material* parseMaterial(char mat, Pixel colour) {
 		}
 		case'M':
 		case 'm': {
-			return new Metal(colour);
+			return new Mirror(colour);
+
+		}
+		case'I':
+		case 'i': {
+			return new Ivory(colour);
 
 		}
 	}
@@ -259,7 +261,4 @@ void printPixels(Pixel* frameBuffer) {
 		}
 		std::cout << std::endl;
 	}
-
-
-
 }
