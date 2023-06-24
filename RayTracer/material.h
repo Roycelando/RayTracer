@@ -48,12 +48,12 @@ class Rubber : public Material {
 
 		Pixel dColour = Pixel(1,0,0);
 
-		Rubber(Pixel &colour) : Material(colour, 0.2, 1.4, 0.3, 10, 0, 1.0,0.0) {
-		// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+		Rubber(Pixel &colour) : Material(colour, 0.0, 1.4, 0.3, 10, 0, 1.0,0.0) {
+		// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction index, refration ratio
 		}
 
 		Rubber(double r, double g, double b) : Material(r,g,b,0.6, 0.6, 0.6, 20, 0, 0,0) {
-			//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+			//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refration index, refraction ratio
 
 		}
 
@@ -68,11 +68,11 @@ class Glass : public Material {
 		Pixel dColour = Pixel(1,0,0);
 
 		Glass(Pixel &colour) : Material(colour, 0.1, 0, 0.9, 125, 0.1, 1.2, 1.0) {
-			// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+		// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio, refration index
 		}
 
 		Glass() : Material(dColour, 0, 0, 0.9, 125, 0, 1.5,0.8) {
-		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio, refration index
 
 		}
 
@@ -86,12 +86,12 @@ class Mirror : public Material {
 		Pixel dColour = Pixel(1,0,0);
 
 		Mirror(Pixel &colour) : Material(colour, 0, 0, 16.0, 1425, 0.8, 1.0, 0.0) {
-			// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refract index, refraction ratio
+			// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction index, refraction ratio
 
 		}
 
 		Mirror() : Material(dColour, 0.5, 0.0, 0.8, 1425, 1, 1.5,0) {
-		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction index, refraction ratio
 
 		}
 
@@ -103,17 +103,17 @@ class Ivory : public Material {
 	public:
 		Pixel dColour = Pixel(1,0,0);
 
-		Ivory(Pixel &colour) : Material(colour, 0.0, 0.9, 0.5, 50, 0.1, 1.0,0.0) {
-			// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+		Ivory(Pixel &colour) : Material(colour, 0.1, 0.9, 0.5, 50, 0.1, 1.0, 0.0) {
+			// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction index, refraction ratio
 
 		}
 
-		Ivory() : Material(dColour, 0.5, 0, 0.8, 100, 1, 1.5,0) {
-		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+		Ivory() : Material(dColour, 0.1, 0, 0.9, 50, 0.1, 1.0, 0.0) {
+		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction index, refraction, ratio
 
 		}
 
-		Ivory(double r, double g, double b) : Material(r,g,b, 0.5, 0, 1.0, 1000, 1, 1.5,0) {}
+		Ivory(double r, double g, double b) : Material(r,g,b, 0.1, 0, 0.9, 50, 0.1, 1.0, 0.0) {}
 		
 };
 
@@ -122,12 +122,12 @@ public:
 	Pixel dColour = Pixel(1,0,0);
 
 	Metal(Pixel &colour) : Material(colour, 0.4, 0.4, 0.4, 50, 1, 0.3,0) {
-	// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+	// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction index, refraction, ratio
 
 	}
 
 	Metal() : Material(dColour, 0.4, 0.4, 0.4, 50, 1, 0.3,0) {
-		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction ratio
+		//red, green, blue, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction index, refraction, ratio
 	}
 
 	Metal(double r, double g, double b) : Material(r, g, b, 0.4, 0.4, 0.4, 50, 1, 0.3,0) {}

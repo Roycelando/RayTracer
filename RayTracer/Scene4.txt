@@ -1,10 +1,31 @@
 // Shapes: Shphere example: sphere radius x y z glass r g b
-// middle ball
+// middle clear ball
 s 2 0 0 -10 g 1 1 1
 // behind right  ball
 s 2 3 0 -20 i 1 0 0
 //behind left ball
-s 2 -3 0 -20 r 1 0 1
+s 2 -3 0 -20 i 1 0 1
+// behind top ball
+s 2 0 3 -20 i 1 1 0
+//behind bottom ball
+s 2 0 -3 -20 i 0 0 1
+// mirror top left ball
+s 4 -10 10 -25 m 1 1 1
+// mirror top right ball
+s 4 10 10 -25 m 1 1 1
+// mirror bottom left ball
+s 4 -10 -10 -25 m 1 1 1
+// mirror bottom right ball
+s 4 10 -10 -25 m 1 1 1
+// ball betwenn top mirrors
+s 3 0 10 -25 i 1 1 1
+// ball betwenn bottom mirrors
+s 3 0 -10 -25 i 1 1 1
+// ball betwenn rigth mirrors
+s 3 10 0 -25 r 0 1 1
+// ball betwenn bottom mirrors
+s 3 -10 0 -25 r 0 1 1
+
 // Lights: intensity x y z
 l 1 0 7 5
 l 1 -10 -5 -1
