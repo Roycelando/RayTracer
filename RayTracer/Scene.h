@@ -73,6 +73,7 @@ This method is used for phong shading, gets ambient, diffuse, and specular light
 
 
 			//abmient light
+			hitObj->mat->refrac;
 
 			Iamb += (ambI * hitObj->mat->ambR);
 

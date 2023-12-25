@@ -11,17 +11,13 @@ class Shape {
 		Vector origin;
 		Material* mat;
 		
-		Shape(): origin(0,0,0), mat(new Rubber) {
-		}
+		Shape(): origin(0,0,0), mat(new Rubber) {}
 
-		Shape(Vector origin): origin(origin), mat(new Rubber) {
+		Shape(Vector origin): origin(origin), mat(new Rubber) {}
 
-		}
+		Shape(Vector origin, Material& mat): origin(origin), mat(&mat) {}
 
-		Shape(Vector origin, Material& mat): origin(origin), mat(&mat) {
-		
-		}
-
+		Shape(Material& mat): mat(&mat), origin(0,0,0) {}
 
 		virtual inline bool intersect(Ray& ray , Vector& ri, Vector& normal, double& tclose, Shape* & closestObj, Shape* & curObj) {
 			return false;
@@ -38,7 +34,7 @@ class Shape {
 
 class Sphere: public Shape {
 	public :
-			double radius;
+		double radius;
 
 		Sphere():radius(1), Shape() {}
 			
@@ -100,6 +96,7 @@ class Sphere: public Shape {
 			return true;
 
 	}
+
 	inline bool intersect(Ray& ray, Vector& intersect) override {
 			double epsilon = 0.001;
 			Vector rayDir = ray.getDirection();
@@ -130,7 +127,7 @@ class Sphere: public Shape {
 
 			intersect = ray.getDistanceT(t); 
 			return true;
-		}
+	}
 
 	private:
 
@@ -143,67 +140,90 @@ class Plane:public Shape {
 	public :
 		Vector normal;
 		double distance;
-		std::string name = "Plane";
+		
+		Plane(Vector norm, double dist, Material& m): normal(norm), distance(dist), Shape(Vector(0,0,0),m){}
 
-		Plane(Vector norm, Vector org,double distance){
-			normal = norm;
-			origin = org;
-			this->distance = distance;
-		}
-
-		Plane() {
-			normal = Vector(0,1,0);
-			Vector(0,0,0);
-			distance = 10;
-			mat = new Rubber();
+		Plane() : normal(0,1,0), distance(5), Shape(){
 
 		}
 
-		inline bool intersect(Ray& ray, Vector& ri, Vector& normal, double& tclose, double& tfar, Shape*& hit, Shape*& curObj) {
+		inline bool intersect(Ray& ray, Vector& ri, Vector& normal, double& tclose, Shape*& hit, Shape*& curObj) override {
 			ray.getDirection().normalizeVector();
-			
+			double epsilon = 0.001;
 
 			 double PnRd = dotVectors(this->normal,ray.getDirection());
+			//this->normal.printVector();
 			 //std::cout << "PnRd: " << PnRd << std::endl;
 
-			 if (PnRd >=0) {
+			 if (PnRd >=0) 
 				 return false;
 
-			 }
+			//std::cout << "fail test 1" << std::endl;
+
+			Vector Ro = ray.getOrigin();
+			double t = -(dotVectors(this->normal, Ro) + this->distance)/ PnRd;
 
 
-			 Vector Ro = ray.getOrigin();
-			 Ro.normalizeVector();
-			 double t = -1*(dotVectors(this->normal, Ro) + this->distance)/ PnRd;
-
-
-			 if (t<0 || t>tfar) 
+			 if (t<0 || t>tclose) 
 				 return false;
 
-			 ray.getDirection().normalizeVector();
-			 Vector r = ray.getDirection();
-			 Vector o = ray.getOrigin();
+			 tclose = t;
+			 hit = curObj;
+
+
+			 //std::cout << "fail test 2" << std::endl;
+
+			Vector r = ray.getDirection();
+			Vector o = ray.getOrigin();
 				
-			 ri = Vector((o.x + (r.x*t)),(o.y+(r.y*t)),(o.z+(r.z*t)));
-			 //normal = subPointsV( addPoints(ri,(0,5,0)),ri);
-			 normal = this->normal;
-			 normal.normalizeVector();
+			ri = ray.getDistanceT(t);
+			normal = this->normal;
 
+			//std::cout << "I think I intersected the plane" << std::endl;
+			return true;
 
-
-				return true;
 		}
 
-		virtual	inline bool intersect(Ray& ray, Vector interesect,double tfar) {
+		virtual	inline bool intersect(Ray& ray, Vector& interesect) {
+			ray.getDirection().normalizeVector();
+			double epsilon = 0.001;
 
-			return false;
+			double PnRd = dotVectors(this->normal, ray.getDirection());
+			// std::cout << "PnRd: " << PnRd << std::endl;
+
+			if (PnRd >= 0)
+				return false;
+
+		 //std::cout << "fail test 1 (2)" << std::endl;
+
+
+
+			Vector Ro = ray.getOrigin();
+			double t = -1 * (dotVectors(this->normal, Ro) + this->distance) / PnRd;
+
+
+			if (t<0)
+				return false;
+
+			Vector r = ray.getDirection();
+			Vector o = ray.getOrigin();
+
+			interesect = ray.getDistanceT(t);
+
+		//	std::cout << "I think I intersected the plane (2)" << std::endl;
+
+			return true;
+		}
+
+		virtual inline Vector getNormal() {
+			return normal;
+
 		}
 
 };
 
 class Triangle:Shape {
-	public :
-			
+	public : 
 
 
 	private:

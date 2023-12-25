@@ -103,7 +103,7 @@ class Ivory : public Material {
 	public:
 		Pixel dColour = Pixel(1,0,0);
 
-		Ivory(Pixel &colour) : Material(colour, 0.1, 0.9, 0.5, 50, 0.1, 1.0, 0.0) {
+		Ivory(Pixel &colour) : Material(colour, 0.1, 0.9, 0.5, 50, 0.1, 0, 0.0) {
 			// colour, abmient Ratio, Diffuse Ratio, Specular Ratio, Specular Highlight, refelection ratio, refraction index, refraction ratio
 
 		}

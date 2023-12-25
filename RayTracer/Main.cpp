@@ -80,6 +80,8 @@ Pixel rayTrace(Ray ray, double depth, const double etai) {
 	
 	if (depth > 4 || !(scene.intersect(ray, hitPoint, normal, tclose, hitObject))) 
 		return background;
+
+		//	std::cout << "chekcing that I get in" << std::endl;
 	
 			double shade = std::max(std::min(scene.shade(hitObject,hitPoint,normal,ray),1.0),0.0);
 			local = clamp(multPixels(hitObject->mat->colour,shade));
@@ -152,6 +154,7 @@ void loadScene() {
 	double r = -1, g = -1, b = -1;
 	char m = 'g';
 	double intensity = -1;
+	double distance = -1;
 	Material* mat = nullptr;
 
 	if (!infile.is_open()) 
@@ -172,18 +175,35 @@ void loadScene() {
 			//sphere
 			if (shape == "s" || shape == "S") {
 
-				infile >> radius, infile >> x, infile >> y,infile >> z,infile >> m,infile >> r, infile >> g,infile >> b;
+				infile >> radius >> x >> y >> z >> m >> r >> g >> b;
 				
 				Vector point = Vector(x,y,z); // creates the Point object
 				Pixel pix = Pixel(r, g, b);
 				mat = parseMaterial(m,pix);
 							
-				std::cout << shape << " "<< radius<< " " << x<< " " << y << " "<< " "<< z <<" "<< m << " " << r << " "<< g <<" "<< b << std::endl;
 
 				Shape* object = new Sphere(radius,point, *mat);
 
 				scene.addObjects(object);
 				
+				std::cout << shape << " "<< radius<< " " << x<< " " << y << " "<< " "<< z <<" "<< m << " " << r << " "<< g <<" "<< b << std::endl;
+
+			}
+			//plane
+			else if (shape == "p" || shape=="P") {
+				infile >> distance >> x >> y >> z >> m >> r >> g >> b;
+				Vector normal = Vector(x,y,z);
+			//	normal.printVector();
+				normal.normalizeVector();
+				Pixel pix = Pixel(r,g,b);
+				mat = parseMaterial(m,pix);
+
+				Shape* object = new Plane(normal, distance,*mat);
+				//std::cout << "material: " << object->mat->ambR<< std::endl;
+
+				scene.addObjects(object);
+				
+				std::cout<<shape << " " << distance << " " << x << " " << y << " " << z <<" " << m << " " << r << " " << g << " " << b << std::endl;
 
 			}
 
